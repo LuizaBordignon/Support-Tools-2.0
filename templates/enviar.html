@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar Backup</title>
+</head>
+<body>
+    <h1>Support Tools 2.0 - Envio de Backup</h1>
+    <p>Preencha o formulário a seguir para a geração do link para o seu cliente.</p>
+
+    <select class="form-select" aria-label="Default select example">
+        <option selected>Clientes ou Unidades?</option>
+        {% for dir in unidades %}
+            <option value="{{ dir }}">{{ dir }}</option>
+        {% endfor %}
+    </select>
+
+    <select class="form-select" aria-label="Default select example">
+        <option selected>Selecione a unidade do cliente</option>
+        {% for dir in diretorios %}
+            <option value="{{ dir }}">{{ dir }}</option>
+        {% endfor %}
+    </select>
+
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="Digite o código do cliente" aria-label="Username" aria-describedby="basic-addon1">
+    </div>
+
+    <div class="input-group mb-3">
+        <p>Possui subpasta?</p>
+        <div class="input-group-text">
+            <input class="form-check-input mt-0" type="checkbox" value="" aria-label="Checkbox for following text input">
+        </div>
+        <input type="text" class="form-control" aria-label="Text input with checkbox">
+    </div>
+
+</body>
+</html>
