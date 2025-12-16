@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, jsonify
 from ftplib import FTP
 
 app = Flask(__name__)
@@ -18,7 +18,7 @@ def listar_cliente():
         if linha.startswith('d'):
             nome = linha.split()[-1]
             unidades.append(nome)
-            
+
     return unidades
 
 def listar_diretorios_ftp():
