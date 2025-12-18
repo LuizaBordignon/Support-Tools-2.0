@@ -1,24 +1,42 @@
-document.getElementById('tem_subpasta').addEventListener('change', function () {
-    document.getElementById('subpasta').disabled = !this.checked;
+document.addEventListener('DOMContentLoaded', function () {
+
+    const checkbox = document.getElementById('tem_subpasta');
+    const subpasta = document.getElementById('subpasta');
+
+    if (checkbox && subpasta) {
+        checkbox.addEventListener('change', function () {
+            subpasta.disabled = !this.checked;
+        });
+    }
+
 });
 
-function montarCaminho() {
-    const tipo = document.getElementById('tipo').value;
-    const unidade = document.getElementById('unidade').value;
-    const codigo = document.getElementById('codigo').value;
-    const temSubpasta = document.getElementById('tem_subpasta').checked;
-    const subpasta = document.getElementById('subpasta').value;
+document.getElementById('formUpload').addEventListener('submit', function (e) {
+    e.preventDefault();
 
-    if (!tipo || !unidade || !codigo) {
-        alert('Preencha todos os campos obrigatórios');
-        return;
-    }
+    const arquivo = document.getElementById('arquivo').files[0];
+    const formData = new FormData();
+    formData.append('arquivo', arquivo);
 
-    let caminho = `/${tipo}/${unidade}/${codigo}`;
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', window.location.href);
 
-    if (temSubpasta && subpasta) {
-        caminho += `/${subpasta}`;
-    }
+    xhr.upload.onprogress = function (e) {
+        if (e.lengthComputable) {
+            const percent = Math.round((e.loaded / e.total) * 100);
+            document.getElementById('barra').value = percent;
+            document.getElementById('porcentagem').innerText = percent + '%';
+        }
+    };
 
-    document.getElementById('resultado').innerText = caminho;
-}
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            document.getElementById('porcentagem').innerText = 'Upload concluído';
+        } else {
+            document.getElementById('porcentagem').innerText = 'Erro no upload';
+        }
+    };
+
+    xhr.send(formData);
+});
+

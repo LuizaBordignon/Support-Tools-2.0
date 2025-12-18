@@ -9,31 +9,32 @@
     <h1>Support Tools 2.0 - Envio de Backup</h1>
     <p>Preencha o formulário a seguir para a geração do link para o seu cliente.</p>
 
-    <select id="tipo" class="form-select">
-    <option value="">Clientes ou Unidades?</option>
-    {% for dir in unidades %}
-        <option value="{{ dir }}">{{ dir }}</option>
-    {% endfor %}
-    </select>
+    <form method="POST" action="/gerar_link">
 
-    <select id="unidade" class="form-select">
-        <option value="">Selecione a unidade do cliente</option>
-        {% for dir in diretorios %}
-            <option value="{{ dir }}">{{ dir }}</option>
-        {% endfor %}
-    </select>
+        <select name="tipo">
+            <option value="">Clientes ou Unidades?</option>
+            {% for dir in unidades %}
+                <option value="{{ dir }}">{{ dir }}</option>
+            {% endfor %}
+        </select>
 
-    <input type="text" id="codigo" class="form-control" placeholder="Digite o código do cliente">
+        <select name="unidade">
+            <option value="">Selecione a unidade do cliente</option>
+            {% for dir in diretorios %}
+                <option value="{{ dir }}">{{ dir }}</option>
+            {% endfor %}
+        </select>
 
-    <div class="input-group mb-3">
-        <p>Possui subpasta?</p>
-        <input id="tem_subpasta" type="checkbox">
-        <input type="text" id="subpasta" class="form-control" disabled>
-    </div>
+        <input type="text" name="codigo" placeholder="Digite o código do cliente">
 
-    <button type="button" onclick="montarCaminho()">Gerar caminho</button>
+        <input type="text" name="subpasta" placeholder="Subpasta (opcional)">
 
-    <p id="resultado"></p>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+        <button type="submit">Gerar link</button>
+    </form>
+
+    {% if link %}
+        <p>Link para o cliente:</p>
+        <input type="text" value="{{ link }}" readonly style="width:400px">
+    {% endif %}
 </body>
 </html>

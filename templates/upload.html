@@ -8,7 +8,15 @@
 <body>
     <h1>Support Tools 2.0 - Envio de Backup</h1>
     <p>Prezado cliente, por gentileza, clique no botão abaixo para enviar o arquivo:</p>
-    
+
+    <form id="formUpload">
+    <input type="file" id="arquivo" name="arquivo" required>
+    <button type="submit">Enviar</button>
     </form>
+
+    <progress id="barra" value="0" max="100" style="width: 300px;"></progress>
+    <p id="porcentagem">0%</p>
+    
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
