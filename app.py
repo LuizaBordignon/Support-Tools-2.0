@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, url_for, abort
-from ftplib import FTP
+from flask import Flask, render_template, request, url_for, abort, jsonify
+from ftplib import FTP, error_perm
 import uuid
 
 app = Flask(__name__)
@@ -93,19 +93,50 @@ def upload_cliente(token):
     arquivo = request.files.get('arquivo')
 
     if not arquivo:
-        return "Nenhum arquivo enviado", 400
+        return jsonify({
+            "success": False,
+            "message": "Nenhum arquivo enviado"
+        }), 400
 
     caminho_ftp = links[token]
 
     ftp = FTP('ftp.dominiosistemas.com.br')
     ftp.login(user='suportesc', passwd='pmn7755')
-
     ftp.cwd(caminho_ftp)
-    ftp.storbinary(f"STOR {arquivo.filename}", arquivo)
 
-    ftp.quit()
+    nome_arquivo = arquivo.filename
+    arquivo_existia = True
 
-    return "Upload realizado com sucesso"
+    try:
+        try:
+            ftp.delete(nome_arquivo)
+        except error_perm:
+            arquivo_existia = False
+
+        ftp.storbinary(f"STOR {nome_arquivo}", arquivo)
+
+    except error_perm as e:
+        msg = str(e)
+
+        if "Connection closed; Transfer aborted " in msg:
+            msg = "Queda de conexão, oscilação na internet. Tente novamente."
+        elif "No such file or directory" in msg:
+            msg = "Pasta de destino não encontrada."
+        else:
+            msg = "Erro ao enviar o arquivo."
+
+        return jsonify({
+            "success": False,
+            "message": msg
+        }), 400
+    
+    finally:
+        ftp.quit()
+
+    return jsonify({
+        "success": True,
+        "message": "Upload realizado com sucesso"
+    }), 200
 
 if __name__ == "__main__":
 

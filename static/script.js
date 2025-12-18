@@ -30,13 +30,40 @@ document.getElementById('formUpload').addEventListener('submit', function (e) {
     };
 
     xhr.onload = function () {
-        if (xhr.status === 200) {
-            document.getElementById('porcentagem').innerText = 'Upload concluído';
+        const resposta = JSON.parse(xhr.responseText);
+
+        if (xhr.status === 200 && resposta.success) {
+            document.getElementById('porcentagem').innerText =
+                resposta.message;
         } else {
-            document.getElementById('porcentagem').innerText = 'Erro no upload';
+            document.getElementById('porcentagem').innerText =
+                'Erro: ' + resposta.message;
         }
     };
 
     xhr.send(formData);
+});
+
+document.getElementById('form-upload').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    try {
+        const response = await fetch(window.location.href, {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        const msg = document.getElementById('mensagem');
+        msg.textContent = data.message;
+        msg.style.color = data.success ? 'green' : 'red';
+
+    } catch (err) {
+        document.getElementById('mensagem').textContent =
+            'Erro inesperado ao enviar o arquivo.';
+    }
 });
 
