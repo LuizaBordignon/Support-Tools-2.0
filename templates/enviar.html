@@ -39,12 +39,14 @@
     </form>
 
     {% if link %}
+    <div id="blocoLink">
         <p>Link para o cliente:</p>
-        <input type="text" id= 'linkCliente' value="{{ link }}" readonly style="width:400px">
+        <input type="text" id="linkCliente" value="{{ link }}" readonly style="width:400px">
         <button onclick="copiarLink()">Copiar Link</button>
         <div id="mensagemSucesso" style="color: green; display: none; margin-top: 5px; font-size: 14px;">
-        Link copiado com sucesso!
+            Link copiado com sucesso!
         </div>
+    </div>
     {% endif %}
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>

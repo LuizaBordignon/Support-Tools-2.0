@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, abort, jsonify
+from flask import Flask, render_template, request, url_for, jsonify
 from ftplib import FTP, error_perm
 import uuid
 
@@ -55,6 +55,7 @@ def index():
 def envio():
     diretorios = listar_diretorios_ftp()
     unidades = listar_cliente()
+    
     return render_template(
         'enviar.html',
         diretorios=diretorios,

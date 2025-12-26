@@ -57,6 +57,18 @@ btnAdicionar.addEventListener('click', function() {
     container.appendChild(novoDiv);
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+    const bloco = document.getElementById("blocoLink");
 
+    if (bloco) {
+        if (sessionStorage.getItem("link_ja_mostrado")) {
+            bloco.remove();
+        } else {
+            sessionStorage.setItem("link_ja_mostrado", "true");
+        }
+    }
+});
 
-
+document.querySelector("form").addEventListener("submit", () => {
+    sessionStorage.removeItem("link_ja_mostrado");
+});
