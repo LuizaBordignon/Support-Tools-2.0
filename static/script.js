@@ -72,3 +72,10 @@ document.addEventListener("DOMContentLoaded", () => {
 document.querySelector("form").addEventListener("submit", () => {
     sessionStorage.removeItem("link_ja_mostrado");
 });
+
+// botão de voltar a pagina 
+const btnVoltar = document.getElementById('btn-voltar')
+btnVoltar.addEventListener('click', function(){
+    window.history.back()
+});
+
