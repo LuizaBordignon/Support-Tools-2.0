@@ -27,14 +27,27 @@
 
         <input type="text" name="codigo" placeholder="Digite o código do cliente">
 
-        <input type="text" name="subpasta" placeholder="Subpasta (opcional)">
+        <div id="lista-campos">
+            <div class="grupo-input">
+                <input type="text" name="subpasta[]" placeholder="Subpasta (opcional)">
+                </div>
+        </div>
+        
+        <button type="button" class="btn-add" id="btn-adicionar" title="Adicionar novo campo">+</button>
 
         <button type="submit">Gerar link</button>
     </form>
 
     {% if link %}
         <p>Link para o cliente:</p>
-        <input type="text" value="{{ link }}" readonly style="width:400px">
+        <input type="text" id= 'linkCliente' value="{{ link }}" readonly style="width:400px">
+        <button onclick="copiarLink()">Copiar Link</button>
+        <div id="mensagemSucesso" style="color: green; display: none; margin-top: 5px; font-size: 14px;">
+        Link copiado com sucesso!
+        </div>
     {% endif %}
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
 </body>
 </html>

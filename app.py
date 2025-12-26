@@ -4,6 +4,10 @@ import uuid
 
 app = Flask(__name__)
 
+# =========================
+# LISTAGENS FTP
+# =========================
+
 def listar_cliente():
     ftp = FTP('ftp.dominiosistemas.com.br')
     ftp.login(user='suportesc', passwd='pmn7755')
@@ -11,16 +15,15 @@ def listar_cliente():
     ftp.cwd('/')
     itens = []
     ftp.dir(itens.append)
-
     ftp.quit()
 
     unidades = []
     for linha in itens:
         if linha.startswith('d'):
-            nome = linha.split()[-1]
-            unidades.append(nome)
+            unidades.append(linha.split()[-1])
 
     return unidades
+
 
 def listar_diretorios_ftp():
     ftp = FTP('ftp.dominiosistemas.com.br')
@@ -34,20 +37,34 @@ def listar_diretorios_ftp():
     diretorios = []
     for linha in itens:
         if linha.startswith('d'):
-            nome = linha.split()[-1]
-            diretorios.append(nome)
+            diretorios.append(linha.split()[-1])
 
     return diretorios
+
+
+# =========================
+# ROTAS
+# =========================
 
 @app.route("/")
 def index():
     return render_template('index.html')
 
+
 @app.route("/envio")
 def envio():
     diretorios = listar_diretorios_ftp()
     unidades = listar_cliente()
-    return render_template('enviar.html', diretorios=diretorios, unidades=unidades)
+    return render_template(
+        'enviar.html',
+        diretorios=diretorios,
+        unidades=unidades
+    )
+
+
+# =========================
+# GERAÇÃO DE LINK
+# =========================
 
 links = {}
 
@@ -56,17 +73,17 @@ def gerar_link():
     tipo = request.form.get('tipo')
     unidade = request.form.get('unidade')
     codigo = request.form.get('codigo')
-    subpasta = request.form.get('subpasta')
+    subpastas = request.form.getlist('subpasta[]')
 
     if not tipo or not unidade or not codigo:
         return "Campos obrigatórios não preenchidos", 400
 
     caminho = f"/{tipo}/{unidade}/{codigo}"
-    if subpasta:
-        caminho += f"/{subpasta}"
+    for subpasta in subpastas:
+        if subpasta.strip():
+            caminho += f"/{subpasta.strip()}"
 
     token = str(uuid.uuid4())
-
     links[token] = caminho
 
     link_cliente = url_for('upload_cliente', token=token, _external=True)
@@ -82,10 +99,17 @@ def gerar_link():
     )
 
 
+# =========================
+# UPLOAD DO CLIENTE
+# =========================
+
 @app.route('/upload/<token>', methods=['GET', 'POST'])
 def upload_cliente(token):
     if token not in links:
-        return abort(404)
+        return jsonify({
+            "success": False,
+            "message": "Link inválido ou expirado."
+        }), 404
 
     if request.method == 'GET':
         return render_template('upload.html')
@@ -95,49 +119,72 @@ def upload_cliente(token):
     if not arquivo:
         return jsonify({
             "success": False,
-            "message": "Nenhum arquivo enviado"
+            "message": "Nenhum arquivo enviado."
         }), 400
 
     caminho_ftp = links[token]
+    nome_arquivo = arquivo.filename
 
     ftp = FTP('ftp.dominiosistemas.com.br')
-    ftp.login(user='suportesc', passwd='pmn7755')
-    ftp.cwd(caminho_ftp)
-
-    nome_arquivo = arquivo.filename
-    arquivo_existia = True
 
     try:
+        ftp.login(user='suportesc', passwd='pmn7755')
+
+        # tenta acessar a pasta
+        try:
+            ftp.cwd(caminho_ftp)
+        except error_perm:
+            return jsonify({
+                "success": False,
+                "message": "A pasta de destino não existe. Verifique o caminho informado."
+            }), 400
+
+        # tenta apagar arquivo existente (sobrescrever)
         try:
             ftp.delete(nome_arquivo)
         except error_perm:
-            arquivo_existia = False
+            pass
 
         ftp.storbinary(f"STOR {nome_arquivo}", arquivo)
 
-    except error_perm as e:
-        msg = str(e)
+        return jsonify({
+            "success": True,
+            "message": "Upload realizado com sucesso."
+        }), 200
 
-        if "Connection closed; Transfer aborted " in msg:
-            msg = "Queda de conexão, oscilação na internet. Tente novamente."
-        elif "No such file or directory" in msg:
-            msg = "Pasta de destino não encontrada."
+    except error_perm as e:
+        erro = str(e)
+
+        if "Permission denied" in erro:
+            msg = "Sem permissão para enviar arquivos para este local."
+        elif "Overwrite permission denied" in erro:
+            msg = "Não é permitido sobrescrever arquivos nesta pasta."
+        elif "No such file or directory" in erro:
+            msg = "A pasta de destino não existe. Entre em contato com o suporte."
         else:
-            msg = "Erro ao enviar o arquivo."
+            msg = "Erro ao enviar o arquivo para o servidor."
 
         return jsonify({
             "success": False,
             "message": msg
         }), 400
-    
-    finally:
-        ftp.quit()
 
-    return jsonify({
-        "success": True,
-        "message": "Upload realizado com sucesso"
-    }), 200
+    except Exception:
+        return jsonify({
+            "success": False,
+            "message": "Erro inesperado no servidor."
+        }), 500
+
+    finally:
+        try:
+            ftp.quit()
+        except:
+            pass
+
+
+# =========================
+# MAIN
+# =========================
 
 if __name__ == "__main__":
-
     app.run(debug=True)

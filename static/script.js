@@ -1,69 +1,62 @@
-document.addEventListener('DOMContentLoaded', function () {
 
-    const checkbox = document.getElementById('tem_subpasta');
-    const subpasta = document.getElementById('subpasta');
+// copiar link do cliente
 
-    if (checkbox && subpasta) {
-        checkbox.addEventListener('change', function () {
-            subpasta.disabled = !this.checked;
-        });
-    }
+function copiarLink() {
+    var linkElement = document.getElementById('linkCliente');
+    var mensagem = document.getElementById('mensagemSucesso');
+    linkElement.select();
 
-});
+   navigator.clipboard.writeText(linkElement.value).then(() => {
+        // Mostra a mensagem de sucesso
+        mensagem.style.display = "block";
+        
+        // Esconde a mensagem após 2 segundos
+        setTimeout(() => {
+            mensagem.style.display = "none";
+        }, 2000);
 
-document.getElementById('formUpload').addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    const arquivo = document.getElementById('arquivo').files[0];
-    const formData = new FormData();
-    formData.append('arquivo', arquivo);
-
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', window.location.href);
-
-    xhr.upload.onprogress = function (e) {
-        if (e.lengthComputable) {
-            const percent = Math.round((e.loaded / e.total) * 100);
-            document.getElementById('barra').value = percent;
-            document.getElementById('porcentagem').innerText = percent + '%';
+    }).catch(err => {
+        // Fallback: Caso a API falhe ou o navegador seja antigo
+        console.error('Erro ao copiar: ', err);
+        try {
+            document.execCommand('copy');
+            mensagem.style.display = "block";
+        } catch (e) {
+            alert("Erro ao copiar o link.");
         }
-    };
+    });
+}
 
-    xhr.onload = function () {
-        const resposta = JSON.parse(xhr.responseText);
+// campo adicionar mais uma subpasta
+const btnAdicionar = document.getElementById('btn-adicionar')
+const container = document.getElementById('lista-campos');
 
-        if (xhr.status === 200 && resposta.success) {
-            document.getElementById('porcentagem').innerText =
-                resposta.message;
-        } else {
-            document.getElementById('porcentagem').innerText =
-                'Erro: ' + resposta.message;
-        }
-    };
+btnAdicionar.addEventListener('click', function() {
+    const novoDiv = document.createElement('div');
+    novoDiv.className = 'grupo-input';
 
-    xhr.send(formData);
+    const novoInput = document.createElement('input');
+    novoInput.type = 'text';
+    novoInput.name = 'subpasta[]';
+    novoInput.placeholder = 'Subpasta (opcional)';
+    novoInput.required = true;
+
+    const btnRemover = document.createElement('button');
+    btnRemover.type = 'button';
+    btnRemover.className = 'btn-remove';
+    btnRemover.innerText = '-';
+    btnRemover.title = 'Remover este campo';
+
+    btnRemover.addEventListener('click', function() {
+        container.removeChild(novoDiv);
+     });
+
+    // Monta os elementos na tela
+    novoDiv.appendChild(novoInput);
+    novoDiv.appendChild(btnRemover);
+    container.appendChild(novoDiv);
 });
 
-document.getElementById('form-upload').addEventListener('submit', async function (e) {
-    e.preventDefault();
 
-    const formData = new FormData(this);
 
-    try {
-        const response = await fetch(window.location.href, {
-            method: 'POST',
-            body: formData
-        });
-
-        const data = await response.json();
-
-        const msg = document.getElementById('mensagem');
-        msg.textContent = data.message;
-        msg.style.color = data.success ? 'green' : 'red';
-
-    } catch (err) {
-        document.getElementById('mensagem').textContent =
-            'Erro inesperado ao enviar o arquivo.';
-    }
-});
 
