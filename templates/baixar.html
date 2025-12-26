@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baixar Backup</title>
+</head>
+<body>
+    <button id="btn-voltar">Voltar</button>
+    <h1>Support Tools 2.0 - Baixar Backup</h1>
+    <p>Preencha o formulário a seguir para a geração do link para o seu cliente.</p>
+
+    <form method="POST" action="/gerar_link_download">
+
+        <select name="tipo">
+            <option value="">Clientes ou Unidades?</option>
+            {% for dir in unidades %}
+                <option value="{{ dir }}">{{ dir }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="unidade">
+            <option value="">Selecione a unidade do cliente</option>
+            {% for dir in diretorios %}
+                <option value="{{ dir }}">{{ dir }}</option>
+            {% endfor %}
+        </select>
+
+        <input type="text" name="codigo" placeholder="Digite o código do cliente">
+
+        <div id="lista-campos">
+            <div class="grupo-input">
+                <input type="text" name="subpasta[]" placeholder="Subpasta (opcional)">
+                </div>
+        </div>
+        
+        <button type="button" class="btn-add" id="btn-adicionar" title="Adicionar novo campo">+</button>
+
+
+        <button type="submit">Gerar link</button>
+    </form>
+
+    {% if link %}
+    <div id="blocoLink">
+        <p>Link para o cliente:</p>
+        <input type="text" id="linkCliente" value="{{ link }}" readonly style="width:400px">
+        <button onclick="copiarLink()">Copiar Link</button>
+        <div id="mensagemSucesso" style="color: green; display: none; margin-top: 5px; font-size: 14px;">
+            Link copiado com sucesso!
+        </div>
+    </div>
+    {% endif %}
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>

@@ -1,6 +1,6 @@
-from flask import Flask, render_template, request, url_for, jsonify
+from flask import Flask, render_template, request, url_for, jsonify, send_file
 from ftplib import FTP, error_perm
-import uuid
+import uuid, tempfile, os
 
 app = Flask(__name__)
 
@@ -62,6 +62,16 @@ def envio():
         unidades=unidades
     )
 
+@app.route("/baixar")
+def baixar():
+    diretorios = listar_diretorios_ftp()
+    unidades = listar_cliente()
+    
+    return render_template(
+        'baixar.html',
+        diretorios=diretorios,
+        unidades=unidades
+    )
 
 # =========================
 # GERAÇÃO DE LINK
@@ -94,6 +104,40 @@ def gerar_link():
 
     return render_template(
         'enviar.html',
+        diretorios=diretorios,
+        unidades=unidades,
+        link=link_cliente
+    )
+
+@app.route('/gerar_link_download', methods=['POST'])
+def gerar_link_download():
+    tipo = request.form.get('tipo')
+    unidade = request.form.get('unidade')
+    codigo = request.form.get('codigo')
+    subpastas = request.form.getlist('subpasta[]')
+
+    if not tipo or not unidade or not codigo:
+        return "Campos obrigatórios não preenchidos", 400
+
+    caminho = f"/{tipo}/{unidade}/{codigo}"
+    for subpasta in subpastas:
+        if subpasta.strip():
+            caminho += f"/{subpasta.strip()}"
+
+    token = str(uuid.uuid4())
+    links[token] = caminho
+
+    link_cliente = url_for(
+        'download_cliente',
+        token=token,
+        _external=True
+    )
+
+    diretorios = listar_diretorios_ftp()
+    unidades = listar_cliente()
+
+    return render_template(
+        'baixar.html',
         diretorios=diretorios,
         unidades=unidades,
         link=link_cliente
@@ -175,6 +219,62 @@ def upload_cliente(token):
             "success": False,
             "message": "Erro inesperado no servidor."
         }), 500
+
+    finally:
+        try:
+            ftp.quit()
+        except:
+            pass
+
+# =========================
+# DOWNLOAD DO CLIENTE
+# =========================
+
+@app.route('/download/<token>', methods=['GET'])
+def download_cliente(token):
+    if token not in links:
+        return "Link inválido ou expirado.", 404
+
+    caminho_ftp = links[token]
+
+    ftp = FTP('ftp.dominiosistemas.com.br')
+
+    try:
+        ftp.login(user='suportesc', passwd='pmn7755')
+
+        # entra na pasta onde está o backup
+        try:
+            ftp.cwd(caminho_ftp)
+        except error_perm:
+            return "A pasta do backup não existe.", 400
+
+        # lista arquivos da pasta
+        arquivos = ftp.nlst()
+
+        if not arquivos:
+            return "Nenhum backup encontrado nesta pasta.", 404
+
+        # regra simples: pegar o primeiro arquivo
+        nome_arquivo = arquivos[0]
+
+        # cria arquivo temporário
+        temp_dir = tempfile.gettempdir()
+        caminho_local = os.path.join(temp_dir, nome_arquivo)
+
+        with open(caminho_local, 'wb') as f:
+            ftp.retrbinary(f"RETR {nome_arquivo}", f.write)
+
+        return send_file(
+            caminho_local,
+            as_attachment=True,
+            download_name=nome_arquivo
+        )
+
+    except error_perm:
+        return "Erro de permissão ao acessar o backup.", 400
+
+    except Exception:
+        return "Erro inesperado ao baixar o backup.", 500
 
     finally:
         try:
