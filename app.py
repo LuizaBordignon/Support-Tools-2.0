@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, jsonify, send_file
+from flask import Flask, render_template, request, url_for, jsonify, send_file, Response, stream_with_context
 from ftplib import FTP, error_perm
 import uuid, tempfile, os
 
@@ -114,9 +114,10 @@ def gerar_link_download():
     tipo = request.form.get('tipo')
     unidade = request.form.get('unidade')
     codigo = request.form.get('codigo')
+    nome_arquivo = request.form.get('nome_arquivo')
     subpastas = request.form.getlist('subpasta[]')
 
-    if not tipo or not unidade or not codigo:
+    if not tipo or not unidade or not codigo or not nome_arquivo:
         return "Campos obrigatórios não preenchidos", 400
 
     caminho = f"/{tipo}/{unidade}/{codigo}"
@@ -125,10 +126,13 @@ def gerar_link_download():
             caminho += f"/{subpasta.strip()}"
 
     token = str(uuid.uuid4())
-    links[token] = caminho
+    links[token] = {
+        "caminho": caminho,
+        "arquivo": nome_arquivo
+    }
 
     link_cliente = url_for(
-        'download_cliente',
+        'pagina_download_cliente',
         token=token,
         _external=True
     )
@@ -142,7 +146,6 @@ def gerar_link_download():
         unidades=unidades,
         link=link_cliente
     )
-
 
 # =========================
 # UPLOAD DO CLIENTE
@@ -235,53 +238,88 @@ def download_cliente(token):
     if token not in links:
         return "Link inválido ou expirado.", 404
 
-    caminho_ftp = links[token]
+    dados = links[token]
+    caminho_ftp = dados["caminho"].rstrip('/')
+    nome_arquivo = dados["arquivo"]
 
     ftp = FTP('ftp.dominiosistemas.com.br')
 
     try:
         ftp.login(user='suportesc', passwd='pmn7755')
+        ftp.set_pasv(True)
+        ftp.voidcmd('TYPE I')  # binário obrigatório
 
-        # entra na pasta onde está o backup
         try:
             ftp.cwd(caminho_ftp)
         except error_perm:
-            return "A pasta do backup não existe.", 400
+            return f"Pasta não encontrada: {caminho_ftp}", 400
 
-        # lista arquivos da pasta
-        arquivos = ftp.nlst()
+        # tenta obter tamanho
+        try:
+            tamanho = ftp.size(nome_arquivo)
+        except:
+            tamanho = None
 
-        if not arquivos:
-            return "Nenhum backup encontrado nesta pasta.", 404
+        if not tamanho:
+            # fallback: lista arquivos
+            arquivos = ftp.nlst()
+            if nome_arquivo not in arquivos:
+                return "Arquivo não encontrado.", 404
+            # tamanho desconhecido → progresso não será exato
+            tamanho = 0
 
-        # regra simples: pegar o primeiro arquivo
-        nome_arquivo = arquivos[0]
+        conn = ftp.transfercmd(f"RETR {nome_arquivo}")
 
-        # cria arquivo temporário
-        temp_dir = tempfile.gettempdir()
-        caminho_local = os.path.join(temp_dir, nome_arquivo)
+        def gerar():
+            try:
+                while True:
+                    bloco = conn.recv(8192)
+                    if not bloco:
+                        break
+                    yield bloco
+            finally:
+                try:
+                    conn.close()
+                    ftp.voidresp()
+                    ftp.quit()
+                except:
+                    pass
 
-        with open(caminho_local, 'wb') as f:
-            ftp.retrbinary(f"RETR {nome_arquivo}", f.write)
-
-        return send_file(
-            caminho_local,
-            as_attachment=True,
-            download_name=nome_arquivo
+        response = Response(
+            stream_with_context(gerar()),
+            mimetype='application/octet-stream'
         )
 
-    except error_perm:
-        return "Erro de permissão ao acessar o backup.", 400
+        response.headers['Content-Disposition'] = (
+            f'attachment; filename="{nome_arquivo}"'
+        )
 
-    except Exception:
-        return "Erro inesperado ao baixar o backup.", 500
+        if tamanho:
+            response.headers['Content-Length'] = tamanho
 
+        return response
+
+    except error_perm as e:
+        return f"Erro FTP: {str(e)}", 404
+
+    except Exception as e:
+        return f"Erro inesperado: {str(e)}", 500
+    
     finally:
         try:
             ftp.quit()
         except:
             pass
 
+@app.route('/download_link/<token>', methods=['GET'])
+def pagina_download_cliente(token):
+    if token not in links:
+        return "Link inválido ou expirado.", 404
+
+    return render_template(
+        'download.html',
+        token=token
+    )
 
 # =========================
 # MAIN
