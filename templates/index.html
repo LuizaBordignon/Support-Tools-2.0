@@ -7,12 +7,15 @@
 </head>
 <body>
     <h1>Support Tools 2.0</h1>
-    <br>
-    <a href="{{ url_for('envio') }}">
-        <button>Enviar backup</button>
-    </a>
-    <a href="{{ url_for('baixar') }}">
-        <button>Baixar Backup</button>
-    </a>
+    <div class="botoes-container">
+        <a href="{{ url_for('envio') }}">
+            <button>Enviar backup</button>
+        </a>
+        <a href="{{ url_for('baixar') }}">
+            <button>Baixar Backup</button>
+        </a>
+    </div>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
 </body>
 </html>
