@@ -9,13 +9,15 @@
     <h1>Support Tools 2.0 - Baixar Backup</h1>
     <p>Prezado cliente, por gentileza, clique no botão abaixo para baixar o arquivo:</p>
 
-    <button id="btnBaixar" type="button">Baixar</button>
 
-    <h3>Baixando arquivo...</h3>
+    <p>Arquivo: {{ nome_arquivo }}</p>
 
-   <progress id="barra" value="0" max="100" style="width: 300px;"></progress>
-    <p id="porcentagem">0%</p>
+    {% if tamanho_mb %}
+    <p>Tamanho: ({{ tamanho_mb }} MB).</p>
+    {% endif %}
 
-    <script src="{{ url_for('static', filename='download.js') }}"></script>
-</body>
+    <a href="{{ url_for('download_cliente', token=token) }}">
+        <button>Baixar</button>
+    </a>
+
 </html>

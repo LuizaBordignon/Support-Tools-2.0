@@ -247,40 +247,33 @@ def download_cliente(token):
     try:
         ftp.login(user='suportesc', passwd='pmn7755')
         ftp.set_pasv(True)
-        ftp.voidcmd('TYPE I')  # binário obrigatório
+        ftp.voidcmd('TYPE I')
 
         try:
             ftp.cwd(caminho_ftp)
         except error_perm:
             return f"Pasta não encontrada: {caminho_ftp}", 400
 
-        # tenta obter tamanho
         try:
             tamanho = ftp.size(nome_arquivo)
         except:
             tamanho = None
-
-        if not tamanho:
-            # fallback: lista arquivos
-            arquivos = ftp.nlst()
-            if nome_arquivo not in arquivos:
-                return "Arquivo não encontrado.", 404
-            # tamanho desconhecido → progresso não será exato
-            tamanho = 0
 
         conn = ftp.transfercmd(f"RETR {nome_arquivo}")
 
         def gerar():
             try:
                 while True:
-                    bloco = conn.recv(8192)
+                    bloco = conn.recv(65536)  # 64 KB
                     if not bloco:
                         break
                     yield bloco
             finally:
                 try:
                     conn.close()
-                    ftp.voidresp()
+                except:
+                    pass
+                try:
                     ftp.quit()
                 except:
                     pass
@@ -294,8 +287,8 @@ def download_cliente(token):
             f'attachment; filename="{nome_arquivo}"'
         )
 
-        if tamanho:
-            response.headers['Content-Length'] = tamanho
+        if tamanho is not None:
+            response.headers['Content-Length'] = str(tamanho)
 
         return response
 
@@ -305,12 +298,42 @@ def download_cliente(token):
     except Exception as e:
         return f"Erro inesperado: {str(e)}", 500
     
+@app.route('/download_link/<token>', methods=['GET'])
+def pagina_download(token):
+    if token not in links:
+        return "Link inválido ou expirado.", 404
+
+    dados = links[token]
+    caminho_ftp = dados["caminho"].rstrip('/')
+    nome_arquivo = dados["arquivo"]
+
+    ftp = FTP('ftp.dominiosistemas.com.br')
+    tamanho = None
+
+    try:
+        ftp.login(user='suportesc', passwd='pmn7755')
+        ftp.set_pasv(True)
+        ftp.voidcmd('TYPE I')
+        ftp.cwd(caminho_ftp)
+
+        try:
+            tamanho = ftp.size(nome_arquivo)
+        except:
+            tamanho = None
     finally:
         try:
             ftp.quit()
         except:
             pass
 
+    tamanho_mb = round(tamanho / (1024 * 1024), 1) if tamanho else None
+    return render_template(
+        "download.html",
+        nome_arquivo=nome_arquivo,
+        tamanho_mb=tamanho_mb,
+        token=token
+    )
+    
 @app.route('/download_link/<token>', methods=['GET'])
 def pagina_download_cliente(token):
     if token not in links:
