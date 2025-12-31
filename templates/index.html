@@ -2,20 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Support Tools 2.0</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Support Tools 2.0</h1>
-    <div class="botoes-container">
-        <a href="{{ url_for('envio') }}">
-            <button>Enviar backup</button>
-        </a>
-        <a href="{{ url_for('baixar') }}">
-            <button>Baixar Backup</button>
-        </a>
-    </div>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+    <main class="container">
+        <div class="header-box">
+            <h1>Support Tools <span class="highlight">2.0</span></h1>
+            <p>Selecione uma ação abaixo</p>
+        </div>
+
+        <div class="actions">
+            <a href="{{ url_for('envio') }}">
+                <button class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    <span>Enviar Backup</span>
+                </button>
+            </a>
+
+            <a href="{{ url_for('baixar') }}">
+                <button class="btn btn-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <span>Baixar Backup</span>
+                </button>
+            </a>
+        </div>
+    </main>
 
 </body>
 </html>

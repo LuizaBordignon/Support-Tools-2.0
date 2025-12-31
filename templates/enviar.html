@@ -1,54 +1,88 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enviar Backup</title>
+    <title>Envio de Backup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <button id="btn-voltar">Voltar</button>
-    <h1>Support Tools 2.0 - Envio de Backup</h1>
-    <p>Preencha o formulário a seguir para a geração do link para o seu cliente.</p>
 
-    <form method="POST" action="/gerar_link">
+    <main class="card">
+        <div class="card-line"></div>
 
-        <select name="tipo">
-            <option value="">Clientes ou Unidades?</option>
-            {% for dir in unidades %}
-                <option value="{{ dir }}">{{ dir }}</option>
-            {% endfor %}
-        </select>
+        <button id="btn-voltar" onclick="history.back()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Voltar
+        </button>
 
-        <select name="unidade">
-            <option value="">Selecione a unidade do cliente</option>
-            {% for dir in diretorios %}
-                <option value="{{ dir }}">{{ dir }}</option>
-            {% endfor %}
-        </select>
+        <div class="header">
+            <h1>Envio de Backup</h1>
+            <p>Preencha os dados para gerar o link do cliente.</p>
+        </div>
 
-        <input type="text" name="codigo" placeholder="Digite o código do cliente">
+        <form method="POST" action="/gerar_link" class="form-grid">
 
-        <div id="lista-campos">
-            <div class="grupo-input">
-                <input type="text" name="subpasta[]" placeholder="Subpasta (opcional)">
+            <div class="input-group">
+                <label>Tipo de Seleção</label>
+                <select name="tipo" class="form-control" required>
+                    <option value="" disabled selected>Clientes ou Unidades?</option>
+                    {% for dir in unidades %}
+                        {% if dir != '.' and dir != '..' %} 
+                            <option value="{{ dir }}">{{ dir }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Unidade</label>
+                <select name="unidade" class="form-control" required>
+                    <option value="" disabled selected>Selecione a unidade</option>
+                    {% for dir in diretorios %}
+                        {% if dir != '.' and dir != '..' %} 
+                            <option value="{{ dir }}">{{ dir }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Código do Cliente</label>
+                <input type="text" name="codigo" class="form-control" placeholder="Ex: 1234" required>
+            </div>
+
+            <div id="lista-campos" class="input-group">
+                <label>Subpastas (Opcional)</label>
+                <div class="grupo-input-wrapper">
+                    <input type="text" name="subpasta[]" class="form-control" placeholder="Nome da subpasta">
                 </div>
-        </div>
-        
-        <button type="button" class="btn-add" id="btn-adicionar" title="Adicionar novo campo">+</button>
+            </div>
+            
+            <button type="button" class="btn-add-field" id="btn-adicionar" title="Adicionar nova subpasta">
+                + Adicionar Subpasta
+            </button>
 
-        <button type="submit">Gerar link</button>
-    </form>
+            <button type="submit" class="btn-submit">
+                Gerar Link
+            </button>
+        </form>
 
-    {% if link %}
-    <div id="blocoLink">
-        <p>Link para o cliente:</p>
-        <input type="text" id="linkCliente" value="{{ link }}" readonly style="width:400px">
-        <button onclick="copiarLink()">Copiar Link</button>
-        <div id="mensagemSucesso" style="color: green; display: none; margin-top: 5px; font-size: 14px;">
-            Link copiado com sucesso!
+        {% if link %}
+        <div id="blocoLink" class="result-box">
+            <p class="result-label">Link gerado com sucesso:</p>
+            <div class="copy-wrapper">
+                <input type="text" id="linkCliente" value="{{ link }}" readonly>
+                <button onclick="copiarLink()" class="btn-copy">Copiar</button>
+            </div>
+            <div id="mensagemSucesso" class="success-msg">
+                Link copiado!
+            </div>
         </div>
-    </div>
-    {% endif %}
+        {% endif %}
+
+    </main>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 

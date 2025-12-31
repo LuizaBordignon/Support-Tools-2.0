@@ -1,24 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enviar Backup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Support Tools 2.0 - Envio de Backup</h1>
-    <p>Prezado cliente, por gentileza, clique no botão abaixo para enviar o arquivo:</p>
 
-    <form id="formUpload">
-    <input type="file" id="arquivo" name="arquivo" required>
-    <button type="submit">Enviar</button>
-    </form>
+    <main class="card">
+        <div class="card-line"></div>
 
-    <progress id="barra" value="0" max="100" style="width: 300px;"></progress>
-    <p id="porcentagem">0%</p>
-    
-    <p id="mensagem"></p>
-    
+        <div class="header">
+            <h1>Support Tools 2.0</h1>
+            <h2 style="font-size: 1.1rem; color: var(--primary-color); margin-top: 10px;">ENVIO DE BACKUP</h2>
+            <p>Prezado cliente, por gentileza, selecione o arquivo abaixo para enviar.</p>
+        </div>
+
+        <form id="formUpload" class="upload-container">
+            <input type="file" id="arquivo" name="arquivo" required class="input-hidden">
+            
+            <label for="arquivo" class="btn-select-file">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <span>Selecionar Arquivo</span>
+            </label>
+
+            <div id="file-name-display" class="file-name-text">Nenhum arquivo selecionado</div>
+
+            <button type="submit" class="btn-submit" style="width: 100%;">
+                Enviar Agora
+            </button>
+        </form>
+
+        <div class="progress-area">
+            <div class="progress-header">
+                <span id="status-text">Aguardando envio...</span>
+                <span id="porcentagem">0%</span>
+            </div>
+            <progress id="barra" value="0" max="100"></progress>
+        </div>
+
+        <div id="mensagem" class="log-box"></div>
+
+    </main>
+
     <script src="{{ url_for('static', filename='upload.js') }}"></script>
+
 </body>
 </html>

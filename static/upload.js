@@ -46,3 +46,16 @@ document.getElementById('formUpload').addEventListener('submit', function (e) {
 
     xhr.send(formData);
 });
+
+const inputFile = document.getElementById('arquivo');
+const fileNameDisplay = document.getElementById('file-name-display');
+
+inputFile.addEventListener('change', function() {
+    if (this.files && this.files.length > 0) {
+        fileNameDisplay.textContent = this.files[0].name;
+        fileNameDisplay.style.color = "#333";
+        fileNameDisplay.style.fontWeight = "600";
+    } else {
+        fileNameDisplay.textContent = "Nenhum arquivo selecionado";
+     }
+});

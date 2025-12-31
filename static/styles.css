@@ -1,11 +1,581 @@
-h1 {
-    color:orange;
-    text-align: center;
-    margin-top: 50px;
+:root {
+    --primary-color: #FF6B35;   
+    --primary-hover: #e55a2b;
+    --dark-bg: #121214;         
+    --card-bg: #ffffff;         
+    --text-color: #202024;
+    --text-muted: #8d8d99;
 }
-.botoes-container {
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif; 
+}
+
+body {
+    background-color: var(--dark-bg);
+    background-image: radial-gradient(circle at top right, #2a2a2a 0%, #121214 100%);
+    height: 100vh;
     display: flex;
     justify-content: center;
+    align-items: center;
+}
+
+.container {
+    background-color: var(--card-bg);
+    width: 90%;
+    max-width: 600px;
+    padding: 50px 40px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+.container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(90deg, var(--primary-color), #ff9e75);
+}
+
+.header-box h1 {
+    font-size: 2rem;
+    color: var(--text-color);
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.header-box .highlight {
+    color: var(--primary-color);
+}
+
+.header-box p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.actions {
+    display: flex;
+    flex-direction: column; 
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.actions a {
+    text-decoration: none;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px 32px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    width: 100%; 
+    max-width: 300px; 
+}
+
+.btn svg {
+    transition: transform 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 8px 20px rgba(255, 107, 53, 0.2);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(255, 107, 53, 0.3);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    border-color: #e1e1e6;
+    color: var(--text-color);
+}
+
+.btn-secondary:hover {
+    border-color: var(--text-color);
+    background-color: #f7f7f8;
+    transform: translateY(-3px);
+}
+
+.btn:hover svg {
+    transform: scale(1.1);
+}
+
+@media (min-width: 600px) {
+    .actions {
+        flex-direction: row; 
+    }
+}
+
+/* CONFIGURAÇÕES GERAIS */
+:root {
+    --primary-color: #FF6B35;
+    --primary-hover: #e55a2b;
+    --dark-bg: #121214;
+    --card-bg: #ffffff;
+    --text-color: #202024;
+    --text-muted: #8d8d99;
+    --border-color: #e1e1e6;
+    --input-bg: #f2f2f5;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: var(--dark-bg);
+    background-image: radial-gradient(circle at top right, #2a2a2a 0%, #121214 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* --- O CARTÃO --- */
+.card {
+    background-color: var(--card-bg);
+    width: 100%;
+    max-width: 500px; 
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    position: relative;
+    display: flex;
+    flex-direction: column;
     gap: 20px;
-    margin-top: 150px;
+    overflow: hidden;
+}
+
+/* Linha colorida no topo */
+.card-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(90deg, var(--primary-color), #ff9e75);
+}
+
+/* --- CABEÇALHO --- */
+.header {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.header h1 {
+    font-size: 1.5rem;
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.header p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+/* --- BOTÃO VOLTAR --- */
+#btn-voltar {
+    align-self: flex-start;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.2s;
+    font-size: 0.9rem;
+}
+
+#btn-voltar:hover {
+    color: var(--primary-color);
+}
+
+/* --- FORMULÁRIO --- */
+.form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.input-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-left: 4px;
+}
+
+/* Estilo dos Inputs e Selects */
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 2px solid transparent; 
+    background-color: var(--input-bg); 
+    color: var(--text-color);
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.form-control:focus {
+    background-color: #fff;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1);
+}
+
+/* Inputs dinâmicos (subpastas adicionadas) */
+.grupo-input-wrapper {
+    margin-bottom: 8px;
+}
+
+/* --- BOTÕES --- */
+/* Botão Pequeno de Adicionar (+) */
+.btn-add-field {
+    background: none;
+    border: 1px dashed var(--primary-color);
+    color: var(--primary-color);
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    margin-bottom: 10px;
+}
+
+.btn-add-field:hover {
+    background-color: rgba(255, 107, 53, 0.05);
+}
+
+/* Botão Principal (Gerar Link) */
+.btn-submit {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 8px 20px rgba(255, 107, 53, 0.25);
+    margin-top: 10px;
+}
+
+.btn-submit:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(255, 107, 53, 0.35);
+}
+
+/* --- ÁREA DE RESULTADO (LINK) --- */
+.result-box {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    padding: 15px;
+    border-radius: 12px;
+    animation: fadeIn 0.5s ease;
+}
+
+.result-label {
+    color: #15803d; /* Verde escuro */
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+.copy-wrapper {
+    display: flex;
+    gap: 8px;
+}
+
+.copy-wrapper input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #bbf7d0;
+    border-radius: 6px;
+    background: white;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.btn-copy {
+    background-color: #15803d;
+    color: white;
+    border: none;
+    padding: 0 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: opacity 0.2s;
+}
+
+.btn-copy:hover {
+    opacity: 0.9;
+}
+
+.success-msg {
+    color: #15803d;
+    font-size: 0.8rem;
+    margin-top: 5px;
+    font-weight: 600;
+    display: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- ESTILO PARA CAMPOS DINÂMICOS (SUBPASTAS) --- */
+
+/* O container de cada nova linha (Input + Botão Remover) */
+.dynamic-row {
+    display: flex;
+    gap: 10px; 
+    align-items: center;
+    margin-top: 10px;
+    animation: fadeIn 0.3s ease; 
+}
+
+.dynamic-row .form-control {
+    flex: 1;
+}
+
+/* O botão de remover (X ou -) */
+.btn-remove {
+    background-color: #ffe5e5; 
+    color: #cc0000; 
+    border: none;
+    width: 48px; 
+    height: 48px; 
+    border-radius: 10px;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-remove:hover {
+    background-color: #ffcccc;
+    transform: scale(1.05);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- ESTILOS DA TELA DE UPLOAD --- */
+
+.upload-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin: 20px 0;
+    width: 100%;
+}
+
+.input-hidden {
+    display: none;
+}
+
+/* Estilo do Botão "Selecionar Arquivo" (Parece o botão laranja da imagem) */
+.btn-select-file {
+    background-color: rgba(255, 107, 53, 0.1); 
+    border: 2px dashed var(--primary-color);
+    color: var(--primary-color);
+    width: 100%;
+    padding: 30px;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.btn-select-file:hover {
+    background-color: rgba(255, 107, 53, 0.2);
+    transform: translateY(-2px);
+}
+
+.file-name-text {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+/* --- BARRA DE PROGRESSO --- */
+.progress-area {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+}
+
+/* Estilizando a tag <progress> */
+progress {
+    width: 100%;
+    height: 10px;
+    -webkit-appearance: none;
+    appearance: none;
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Fundo da barra */
+progress::-webkit-progress-bar {
+    background-color: #f0f0f5;
+    border-radius: 10px;
+}
+
+/* A parte colorida (enchimento) */
+progress::-webkit-progress-value {
+    background: linear-gradient(90deg, var(--primary-color), #ff9e75);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+/* Para Firefox */
+progress::-moz-progress-bar {
+    background: linear-gradient(90deg, var(--primary-color), #ff9e75);
+    border-radius: 10px;
+}
+/* --- TELA DE DOWNLOAD DO CLIENTE --- */
+
+/* O cartão cinza onde ficam os dados do arquivo */
+.file-info-card {
+    background-color: #f8f9fa; /* Cinza bem clarinho */
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 20px;
+    width: 100%;
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: transform 0.2s;
+}
+
+.file-info-card:hover {
+    border-color: var(--primary-color); /* Fica laranjinha a borda quando passa o mouse */
+    background-color: #fff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* O ícone do arquivo */
+.icon-wrapper {
+    background-color: rgba(255, 107, 53, 0.1);
+    color: var(--primary-color);
+    padding: 12px;
+    border-radius: 50%; /* Faz ficar redondo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Textos do arquivo */
+.file-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden; /* Evita que nome gigante quebre o layout */
+}
+
+.file-details .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.file-details .filename {
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Coloca "..." se o nome for muito grande */
+    max-width: 250px; /* Limita a largura em telas pequenas */
+}
+
+.file-details .filesize {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.file-details .filesize::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background-color: #2ecc71; /* Bolinha verde para dizer que está OK */
+    border-radius: 50%;
+}
+
+/* Link que envolve o botão */
+.download-link {
+    text-decoration: none;
+    width: 100%;
 }

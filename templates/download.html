@@ -1,23 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enviar Backup</title>
+    <title>Baixar Backup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Support Tools 2.0 - Baixar Backup</h1>
-    <p>Prezado cliente, por gentileza, clique no botão abaixo para baixar o arquivo:</p>
 
+    <main class="card">
+        <div class="card-line"></div>
 
-    <p>Arquivo: {{ nome_arquivo }}</p>
+        <div class="header">
+            <h1>Support Tools 2.0</h1>
+            <h2 style="font-size: 1.1rem; color: var(--primary-color); margin-top: 10px;">BAIXAR BACKUP</h2>
+            <p>Prezado cliente, o arquivo está pronto. Clique abaixo para iniciar o download.</p>
+        </div>
 
-    {% if tamanho_mb %}
-    <p>Tamanho: ({{ tamanho_mb }} MB).</p>
-    {% endif %}
+        <div class="file-info-card">
+            <div class="icon-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+            </div>
+            
+            <div class="file-details">
+                <span class="label">Arquivo disponível:</span>
+                <span class="filename" title="{{ nome_arquivo }}">{{ nome_arquivo }}</span>
+                
+                {% if tamanho_mb %}
+                <span class="filesize">Tamanho: {{ tamanho_mb }} MB</span>
+                {% endif %}
+            </div>
+        </div>
 
-    <a href="{{ url_for('download_cliente', token=token) }}">
-        <button>Baixar</button>
-    </a>
+        <a href="{{ url_for('download_cliente', token=token) }}" class="download-link">
+            <button class="btn-submit" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Baixar Agora
+            </button>
+        </a>
 
+    </main>
+
+</body>
 </html>
