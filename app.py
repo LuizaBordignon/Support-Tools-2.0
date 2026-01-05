@@ -1,8 +1,60 @@
 from flask import Flask, render_template, request, url_for, jsonify, send_file, Response, stream_with_context
 from ftplib import FTP, error_perm
-import uuid, tempfile, os
+import uuid, sqlite3
+
+# =========================
+# BANCO DE TOKENS
+# =========================
+
+def init_db():
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS atendimentos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            token TEXT UNIQUE,
+            tipo TEXT,               -- upload ou download
+            caminho TEXT,
+            arquivo TEXT,            -- nome do arquivo (só para download)
+            criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    conn.commit()
+    conn.close()
+
+def salvar_token(token, tipo, caminho, arquivo=None):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO atendimentos (token, tipo, caminho, arquivo)
+        VALUES (?, ?, ?, ?)
+    """, (token, tipo, caminho, arquivo))
+
+    conn.commit()
+    conn.close()
+
+
+def buscar_token(token):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT tipo, caminho, arquivo
+        FROM atendimentos
+        WHERE token = ?
+    """, (token,))
+
+    resultado = cursor.fetchone()
+    conn.close()
+
+    return resultado
+
 
 app = Flask(__name__)
+init_db()
 
 # =========================
 # LISTAGENS FTP
@@ -77,8 +129,6 @@ def baixar():
 # GERAÇÃO DE LINK
 # =========================
 
-links = {}
-
 @app.route('/gerar_link', methods=['POST'])
 def gerar_link():
     tipo = request.form.get('tipo')
@@ -95,7 +145,12 @@ def gerar_link():
             caminho += f"/{subpasta.strip()}"
 
     token = str(uuid.uuid4())
-    links[token] = caminho
+
+    salvar_token(
+        token=token,
+        tipo="upload",
+        caminho=caminho
+    )
 
     link_cliente = url_for('upload_cliente', token=token, _external=True)
 
@@ -126,10 +181,13 @@ def gerar_link_download():
             caminho += f"/{subpasta.strip()}"
 
     token = str(uuid.uuid4())
-    links[token] = {
-        "caminho": caminho,
-        "arquivo": nome_arquivo
-    }
+
+    salvar_token(
+        token=token,
+        tipo="download",
+        caminho=caminho,
+        arquivo=nome_arquivo
+    )
 
     link_cliente = url_for(
         'pagina_download_cliente',
@@ -153,11 +211,13 @@ def gerar_link_download():
 
 @app.route('/upload/<token>', methods=['GET', 'POST'])
 def upload_cliente(token):
-    if token not in links:
-        return jsonify({
-            "success": False,
-            "message": "Link inválido ou expirado."
-        }), 404
+    dados = buscar_token(token)
+    
+    if not dados or dados[0] != "upload":
+            return jsonify({
+                "success": False,
+                "message": "Link inválido."
+            }), 404
 
     if request.method == 'GET':
         return render_template('upload.html')
@@ -170,7 +230,7 @@ def upload_cliente(token):
             "message": "Nenhum arquivo enviado."
         }), 400
 
-    caminho_ftp = links[token]
+    caminho_ftp = dados[1]
     nome_arquivo = arquivo.filename
 
     ftp = FTP('ftp.dominiosistemas.com.br')
@@ -235,12 +295,12 @@ def upload_cliente(token):
 
 @app.route('/download/<token>', methods=['GET'])
 def download_cliente(token):
-    if token not in links:
-        return "Link inválido ou expirado.", 404
-
-    dados = links[token]
-    caminho_ftp = dados["caminho"].rstrip('/')
-    nome_arquivo = dados["arquivo"]
+    dados = buscar_token(token)
+    if not dados or dados[0] != "download":
+        return "Link inválido.", 404
+    
+    caminho_ftp = dados[1].rstrip('/')
+    nome_arquivo = dados[2]
 
     ftp = FTP('ftp.dominiosistemas.com.br')
 
@@ -300,12 +360,12 @@ def download_cliente(token):
     
 @app.route('/download_link/<token>', methods=['GET'])
 def pagina_download_cliente(token):
-    if token not in links:
-        return "Link inválido ou expirado.", 404
+    dados = buscar_token(token)
+    if not dados or dados[0] != "download":
+        return "Link inválido.", 404
 
-    dados = links[token]
-    caminho_ftp = dados["caminho"].rstrip('/')
-    nome_arquivo = dados["arquivo"]
+    caminho_ftp = dados[1].rstrip('/')
+    nome_arquivo = dados[2]
 
     ftp = FTP('ftp.dominiosistemas.com.br')
     tamanho = None
