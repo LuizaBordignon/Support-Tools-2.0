@@ -2,12 +2,19 @@ document.getElementById('formUpload').addEventListener('submit', function (e) {
     e.preventDefault();
 
     const arquivoInput = document.getElementById('arquivo');
-    const mensagem = document.getElementById('porcentagem');
+    // Separei em duas variáveis para não misturar o "0%" com a "Mensagem final"
+    const spanPorcentagem = document.getElementById('porcentagem'); 
+    const divMensagem = document.getElementById('mensagem'); 
 
     if (!arquivoInput.files.length) {
-        mensagem.innerText = 'Selecione um arquivo.';
+        divMensagem.innerText = 'Selecione um arquivo.';
+        divMensagem.className = 'log-box status-error'; // Fica vermelho
         return;
     }
+
+    // Reseta a mensagem antes de começar
+    divMensagem.innerText = '';
+    divMensagem.className = 'log-box'; 
 
     const formData = new FormData();
     formData.append('arquivo', arquivoInput.files[0]);
@@ -19,7 +26,7 @@ document.getElementById('formUpload').addEventListener('submit', function (e) {
         if (e.lengthComputable) {
             const percent = Math.round((e.loaded / e.total) * 100);
             document.getElementById('barra').value = percent;
-            mensagem.innerText = percent + '%';
+            spanPorcentagem.innerText = percent + '%'; // Atualiza só o número
         }
     };
 
@@ -29,24 +36,31 @@ document.getElementById('formUpload').addEventListener('submit', function (e) {
         try {
             resposta = JSON.parse(xhr.responseText);
         } catch {
-            mensagem.innerText = 'Erro inesperado no servidor.';
+            divMensagem.innerText = 'Erro inesperado no servidor.';
+            divMensagem.className = 'log-box status-error'; // Fica vermelho
             return;
         }
 
         if (xhr.status === 200 && resposta.success) {
-            mensagem.innerText = resposta.message;
+            // SUCESSO: Pinta de verde
+            divMensagem.innerText = resposta.message;
+            divMensagem.className = 'log-box status-success'; 
         } else {
-            mensagem.innerText = resposta.message;
+            // ERRO (do backend): Pinta de vermelho
+            divMensagem.innerText = resposta.message;
+            divMensagem.className = 'log-box status-error'; 
         }
     };
 
     xhr.onerror = function () {
-        mensagem.innerText = 'Erro de conexão.';
+        divMensagem.innerText = 'Erro de conexão.';
+        divMensagem.className = 'log-box status-error'; // Fica vermelho
     };
 
     xhr.send(formData);
 });
 
+// Mantive seu código de visualização do nome do arquivo intacto
 const inputFile = document.getElementById('arquivo');
 const fileNameDisplay = document.getElementById('file-name-display');
 

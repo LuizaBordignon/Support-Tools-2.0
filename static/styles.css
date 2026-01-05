@@ -579,3 +579,61 @@ progress::-moz-progress-bar {
     text-decoration: none;
     width: 100%;
 }
+
+/* --- CORREÇÃO DE ROLAGEM (SCROLL) --- */
+
+/* 1. Limita a altura da lista de campos e cria rolagem interna */
+#lista-campos {
+    max-height: 250px; /* Altura máxima (aprox 4 ou 5 campos) */
+    overflow-y: auto;  /* Cria a barra de rolagem vertical se passar da altura */
+    padding-right: 10px; /* Espaço para não colar o texto na barra */
+    margin-bottom: 15px;
+    
+    /* Estilizando a barra de rolagem para ficar bonita (Webkit/Chrome) */
+    scrollbar-width: thin; /* Para Firefox */
+    scrollbar-color: var(--primary-color) #f2f2f5;
+}
+
+/* Design da barra de rolagem no Chrome/Edge/Safari */
+#lista-campos::-webkit-scrollbar {
+    width: 6px;
+}
+
+#lista-campos::-webkit-scrollbar-track {
+    background: #f2f2f5;
+    border-radius: 10px;
+}
+
+#lista-campos::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 10px;
+}
+
+#lista-campos::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary-color); /* Fica laranja ao passar o mouse */
+}
+
+/* Classes de status para a caixa de mensagem */
+.status-success {
+    display: block !important;
+    background-color: #d1fae5; /* Verde claro */
+    border: 1px solid #34d399;
+    color: #065f46;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.status-error {
+    display: block !important;
+    background-color: #fee2e2; /* Vermelho claro */
+    border: 1px solid #f87171;
+    color: #991b1b;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    text-align: center;
+    font-weight: 600;
+}

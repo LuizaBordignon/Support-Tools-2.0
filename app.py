@@ -184,7 +184,7 @@ def upload_cliente(token):
         except error_perm:
             return jsonify({
                 "success": False,
-                "message": "A pasta de destino não existe. Verifique o caminho informado."
+                "message": "A pasta de destino não existe. Entre em contato com o suporte."
             }), 400
 
         # tenta apagar arquivo existente (sobrescrever)
