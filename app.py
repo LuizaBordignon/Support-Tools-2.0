@@ -333,8 +333,7 @@ def pagina_download(token):
         tamanho_mb=tamanho_mb,
         token=token
     )
-    
-@app.route('/download_link/<token>', methods=['GET'])
+
 def pagina_download_cliente(token):
     if token not in links:
         return "Link inválido ou expirado.", 404
