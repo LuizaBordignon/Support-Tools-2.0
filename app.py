@@ -299,7 +299,7 @@ def download_cliente(token):
         return f"Erro inesperado: {str(e)}", 500
     
 @app.route('/download_link/<token>', methods=['GET'])
-def pagina_download(token):
+def pagina_download_cliente(token):
     if token not in links:
         return "Link inválido ou expirado.", 404
 
@@ -333,16 +333,7 @@ def pagina_download(token):
         tamanho_mb=tamanho_mb,
         token=token
     )
-
-def pagina_download_cliente(token):
-    if token not in links:
-        return "Link inválido ou expirado.", 404
-
-    return render_template(
-        'download.html',
-        token=token
-    )
-
+    
 # =========================
 # MAIN
 # =========================
