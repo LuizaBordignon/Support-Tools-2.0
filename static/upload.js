@@ -2,19 +2,23 @@ document.getElementById('formUpload').addEventListener('submit', function (e) {
     e.preventDefault();
 
     const arquivoInput = document.getElementById('arquivo');
-    // Separei em duas variáveis para não misturar o "0%" com a "Mensagem final"
     const spanPorcentagem = document.getElementById('porcentagem'); 
     const divMensagem = document.getElementById('mensagem'); 
+    const statusText = document.getElementById('status-text');
+    const barra = document.getElementById('barra');
 
     if (!arquivoInput.files.length) {
         divMensagem.innerText = 'Selecione um arquivo.';
-        divMensagem.className = 'log-box status-error'; // Fica vermelho
+        divMensagem.className = 'log-box status-error';
         return;
     }
 
-    // Reseta a mensagem antes de começar
+    // Reset visual
     divMensagem.innerText = '';
-    divMensagem.className = 'log-box'; 
+    divMensagem.className = 'log-box';
+    barra.value = 0;
+    spanPorcentagem.innerText = '0%';
+    statusText.innerText = 'Iniciando envio...';
 
     const formData = new FormData();
     formData.append('arquivo', arquivoInput.files[0]);
@@ -25,8 +29,15 @@ document.getElementById('formUpload').addEventListener('submit', function (e) {
     xhr.upload.onprogress = function (e) {
         if (e.lengthComputable) {
             const percent = Math.round((e.loaded / e.total) * 100);
-            document.getElementById('barra').value = percent;
-            spanPorcentagem.innerText = percent + '%'; // Atualiza só o número
+
+            barra.value = percent;
+            spanPorcentagem.innerText = percent + '%';
+
+            if (percent < 100) {
+                statusText.innerText = 'Enviando arquivo...';
+            } else {
+                statusText.innerText = 'Arquivo enviado. Finalizando processamento no servidor...';
+            }
         }
     };
 
@@ -36,29 +47,32 @@ document.getElementById('formUpload').addEventListener('submit', function (e) {
         try {
             resposta = JSON.parse(xhr.responseText);
         } catch {
+            statusText.innerText = 'Erro inesperado.';
             divMensagem.innerText = 'Erro inesperado no servidor.';
-            divMensagem.className = 'log-box status-error'; // Fica vermelho
+            divMensagem.className = 'log-box status-error';
             return;
         }
 
         if (xhr.status === 200 && resposta.success) {
-            // SUCESSO: Pinta de verde
+            statusText.innerText = 'Upload realizado com sucesso!';
             divMensagem.innerText = resposta.message;
-            divMensagem.className = 'log-box status-success'; 
+            divMensagem.className = 'log-box status-success';
         } else {
-            // ERRO (do backend): Pinta de vermelho
+            statusText.innerText = 'Erro no envio.';
             divMensagem.innerText = resposta.message;
-            divMensagem.className = 'log-box status-error'; 
+            divMensagem.className = 'log-box status-error';
         }
     };
 
     xhr.onerror = function () {
+        statusText.innerText = 'Erro de conexão.';
         divMensagem.innerText = 'Erro de conexão.';
-        divMensagem.className = 'log-box status-error'; // Fica vermelho
+        divMensagem.className = 'log-box status-error';
     };
 
     xhr.send(formData);
 });
+
 
 // Mantive seu código de visualização do nome do arquivo intacto
 const inputFile = document.getElementById('arquivo');
