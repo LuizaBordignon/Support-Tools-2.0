@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- 2. LÓGICA DE ADICIONAR SUBPASTAS (O Design Bonito) ---
+    // --- 2. LÓGICA DE ADICIONAR SUBPASTAS ---
     const btnAdicionar = document.getElementById('btn-adicionar');
     const container = document.getElementById('lista-campos');
 
@@ -25,15 +25,12 @@ document.addEventListener('DOMContentLoaded', function() {
             novoInput.name = 'subpasta[]';
             novoInput.className = 'form-control'; // Classe do CSS novo
             novoInput.placeholder = 'Nome da subpasta';
-            
-            // (Opcional) Se você quiser que seja obrigatório preencher ao adicionar:
-            // novoInput.required = true; 
 
             // Cria o Botão de Remover (X vermelho)
             const btnRemover = document.createElement('button');
             btnRemover.type = 'button';
             btnRemover.className = 'btn-remove'; // Classe do CSS novo
-            btnRemover.innerHTML = '&times;'; // Símbolo de "X" (fica mais bonito que o "-")
+            btnRemover.innerHTML = '&times;';
             btnRemover.title = 'Remover este campo';
 
             // Lógica para remover a linha ao clicar no botão
@@ -56,7 +53,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (bloco) {
         // Se já mostramos o link antes e demos refresh, esconde (para não duplicar ou confundir)
-        // Ou mantém visível dependendo da sua regra de negócio.
         // A lógica abaixo remove o bloco se a flag 'link_ja_mostrado' existir.
         if (sessionStorage.getItem("link_ja_mostrado")) {
              bloco.remove();
@@ -75,7 +71,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // --- 4. FUNÇÃO DE COPIAR LINK ---
-// Mantive fora do DOMContentLoaded para poder ser chamada pelo onclick do HTML se necessário
 function copiarLink() {
     var linkElement = document.getElementById('linkCliente');
     var mensagem = document.getElementById('mensagemSucesso');
@@ -83,9 +78,9 @@ function copiarLink() {
     if (!linkElement) return; // Segurança caso o elemento não exista
 
     linkElement.select();
-    linkElement.setSelectionRange(0, 99999); // Para mobile
+    linkElement.setSelectionRange(0, 99999);
 
-    // Tenta usar a API moderna de Clipboard
+    // API moderna de Clipboard
     if (navigator.clipboard) {
         navigator.clipboard.writeText(linkElement.value).then(() => {
             mostrarMensagemSucesso(mensagem);

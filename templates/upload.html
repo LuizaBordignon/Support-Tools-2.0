@@ -33,7 +33,7 @@
             </button>
         </form>
 
-        <div class="progress-area">
+    <div class="progress-area" id="progress-area" style="display: none;">
             <div class="progress-header">
                 <span id="status-text">Aguardando envio...</span>
                 <span id="porcentagem">0%</span>
@@ -41,8 +41,12 @@
             <progress id="barra" value="0" max="100"></progress>
         </div>
 
-        <div id="mensagem" class="log-box"></div>
+        <div id="loading-area" class="loading-area">
+            <div class="spinner"></div>
+            <p class="loading-text">Enviando o arquivo para o servidor.<br>Por gentileza, aguarde...</p>
+        </div>
 
+        <div id="mensagem" class="log-box"></div>
     </main>
 
     <script src="{{ url_for('static', filename='upload.js') }}"></script>

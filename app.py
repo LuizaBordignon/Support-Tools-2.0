@@ -64,15 +64,15 @@ def listar_cliente():
     ftp = FTP('ftp.dominiosistemas.com.br')
     ftp.login(user='suportesc', passwd='pmn7755')
 
-    ftp.cwd('/')
+    ftp.cwd('/') #raiz
     itens = []
-    ftp.dir(itens.append)
+    ftp.dir(itens.append) #adiciona os itens que estão no diretorio na lista
     ftp.quit()
 
     unidades = []
     for linha in itens:
-        if linha.startswith('d'):
-            unidades.append(linha.split()[-1])
+        if linha.startswith('d'): #se nos itens começar com D, é uma pasta (diretorio)
+            unidades.append(linha.split()[-1]) #coleta só o nome das unidades, a última parte da linha
 
     return unidades
 
@@ -150,9 +150,9 @@ def gerar_link():
         token=token,
         tipo="upload",
         caminho=caminho
-    )
+    ) #envia info para o sqlite, para criar o token para aquele caminho em questão
 
-    link_cliente = url_for('upload_cliente', token=token, _external=True)
+    link_cliente = url_for('upload_cliente', token=token, _external=True) #cria o link pro cliente
 
     diretorios = listar_diretorios_ftp()
     unidades = listar_cliente()
@@ -211,7 +211,7 @@ def gerar_link_download():
 
 @app.route('/upload/<token>', methods=['GET', 'POST'])
 def upload_cliente(token):
-    dados = buscar_token(token)
+    dados = buscar_token(token) #verifica se existe o token 
     
     if not dados or dados[0] != "upload":
             return jsonify({
@@ -222,7 +222,7 @@ def upload_cliente(token):
     if request.method == 'GET':
         return render_template('upload.html')
 
-    arquivo = request.files.get('arquivo')
+    arquivo = request.files.get('arquivo') # coleta o arquivo enviado via navegador
 
     if not arquivo:
         return jsonify({
@@ -230,8 +230,8 @@ def upload_cliente(token):
             "message": "Nenhum arquivo enviado."
         }), 400
 
-    caminho_ftp = dados[1]
-    nome_arquivo = arquivo.filename
+    caminho_ftp = dados[1] #recupera o caminho do ftp salvo no sqlite
+    nome_arquivo = arquivo.filename #coleta o nome do arquivo
 
     ftp = FTP('ftp.dominiosistemas.com.br')
 
@@ -253,7 +253,11 @@ def upload_cliente(token):
         except error_perm:
             pass
 
-        ftp.storbinary(f"STOR {nome_arquivo}", arquivo)
+        ftp.storbinary(f"STOR {nome_arquivo}", arquivo) 
+
+        # storbinary: Comando do FTP para enviar binarios.
+        # "STOR nome": O comando FTP.
+        # arquivo: O conteúdo do arquivo que veio do navegador.
 
         return jsonify({
             "success": True,
@@ -296,18 +300,18 @@ def upload_cliente(token):
 @app.route('/download/<token>', methods=['GET'])
 def download_cliente(token):
     dados = buscar_token(token)
-    if not dados or dados[0] != "download":
+    if not dados or dados[0] != "download": #erro para tokens inválidos
         return "Link inválido.", 404
     
-    caminho_ftp = dados[1].rstrip('/')
+    caminho_ftp = dados[1].rstrip('/') #remove se tiver uma barra no final 
     nome_arquivo = dados[2]
 
     ftp = FTP('ftp.dominiosistemas.com.br')
 
     try:
         ftp.login(user='suportesc', passwd='pmn7755')
-        ftp.set_pasv(True)
-        ftp.voidcmd('TYPE I')
+        ftp.set_pasv(True) #modo passivo, evita bloqueios de firewall
+        ftp.voidcmd('TYPE I') #força o modo binário para nao corromper zips e exes
 
         try:
             ftp.cwd(caminho_ftp)
@@ -319,15 +323,15 @@ def download_cliente(token):
         except:
             tamanho = None
 
-        conn = ftp.transfercmd(f"RETR {nome_arquivo}")
+        conn = ftp.transfercmd(f"RETR {nome_arquivo}") #abre a conexão para baixar o arquivo
 
         def gerar():
             try:
                 while True:
-                    bloco = conn.recv(65536)  # 64 KB
+                    bloco = conn.recv(65536)  # 64 KB #le um pedaço de 64kb do ftp
                     if not bloco:
-                        break
-                    yield bloco
+                        break #se não tiver, acabou o arquivo
+                    yield bloco  #o yield entrega esse pedaço para o navegador no momento do download
             finally:
                 try:
                     conn.close()
@@ -340,17 +344,13 @@ def download_cliente(token):
 
         response = Response(
             stream_with_context(gerar()),
-            mimetype='application/octet-stream'
+            mimetype='application/octet-stream' #diz ao navegador que é um arquivo binário generico
         )
 
         response.headers['Content-Disposition'] = (
-            f'attachment; filename="{nome_arquivo}"'
+            f'attachment; filename="{nome_arquivo}"' #configuração para o navegador selecionar o caminho p baixar
         )
-
-        if tamanho is not None:
-            response.headers['Content-Length'] = str(tamanho)
-
-        return response
+        return response #download começa aqui
 
     except error_perm as e:
         return f"Erro FTP: {str(e)}", 404
