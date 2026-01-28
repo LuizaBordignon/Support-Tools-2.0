@@ -77,11 +77,11 @@ def listar_cliente():
     return unidades
 
 
-def listar_diretorios_ftp():
+def listar_diretorios_ftp(tipo):
     ftp = FTP('ftp.dominiosistemas.com.br')
     ftp.login(user='suportesc', passwd='pmn7755')
 
-    ftp.cwd('/clientes')
+    ftp.cwd(f'/{tipo}')
     itens = []
     ftp.dir(itens.append)
     ftp.quit()
@@ -89,7 +89,10 @@ def listar_diretorios_ftp():
     diretorios = []
     for linha in itens:
         if linha.startswith('d'):
-            diretorios.append(linha.split()[-1])
+            nome = linha.split()[-1]
+
+            if nome not in ('.', '..'):
+                diretorios.append(nome)
 
     return diretorios
 
@@ -102,28 +105,24 @@ def listar_diretorios_ftp():
 def index():
     return render_template('index.html')
 
+@app.route('/listar_diretorios/<tipo>')
+def listar_por_tipo(tipo):
+    try:
+        diretorios = listar_diretorios_ftp(tipo)
+        return jsonify(diretorios)
+    except:
+        return jsonify([])
 
 @app.route("/envio")
 def envio():
-    diretorios = listar_diretorios_ftp()
-    unidades = listar_cliente()
-    
-    return render_template(
-        'enviar.html',
-        diretorios=diretorios,
-        unidades=unidades
-    )
+    unidades = listar_cliente()  # raiz: clientes, unidades, etc
+    return render_template('enviar.html', unidades=unidades, diretorios=[])
 
 @app.route("/baixar")
 def baixar():
-    diretorios = listar_diretorios_ftp()
     unidades = listar_cliente()
-    
-    return render_template(
-        'baixar.html',
-        diretorios=diretorios,
-        unidades=unidades
-    )
+    return render_template('baixar.html', unidades=unidades, diretorios=[])
+
 
 # =========================
 # GERAÇÃO DE LINK

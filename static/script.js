@@ -111,3 +111,23 @@ function mostrarMensagemSucesso(elementoMensagem) {
         }, 2000);
     }
 }
+
+document.querySelector('select[name="tipo"]').addEventListener('change', function () {
+    const tipo = this.value;
+    const selectUnidade = document.querySelector('select[name="unidade"]');
+
+    selectUnidade.innerHTML = '<option disabled selected>Carregando...</option>';
+
+    fetch(`/listar_diretorios/${tipo}`)
+        .then(res => res.json())
+        .then(dados => {
+            selectUnidade.innerHTML = '<option disabled selected>Selecione a unidade</option>';
+
+            dados.forEach(dir => {
+                const opt = document.createElement('option');
+                opt.value = dir;
+                opt.textContent = dir;
+                selectUnidade.appendChild(opt);
+            });
+        });
+});
