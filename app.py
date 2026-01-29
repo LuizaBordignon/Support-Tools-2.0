@@ -96,6 +96,19 @@ def listar_diretorios_ftp(tipo):
 
     return diretorios
 
+# =========================
+# FUNÇÕES
+# =========================
+
+def caminho_existe_ftp(caminho):
+    ftp = FTP('ftp.dominiosistemas.com.br')
+    try:
+        ftp.login(user='suportesc', passwd='pmn7755')
+    except error_perm:
+        return False
+    finally:
+        try: ftp.quit()
+        except: pass
 
 # =========================
 # ROTAS
@@ -112,6 +125,45 @@ def listar_por_tipo(tipo):
         return jsonify(diretorios)
     except:
         return jsonify([])
+    
+@app.route('/verificar_pasta', methods=['POST'])
+def verificar_pasta():
+    caminho = request.json.get('caminho')
+
+    if not caminho:
+        return jsonify({'existe': False})
+    
+    existe = caminho_existe_ftp(caminho)
+    return jsonify({'existe': existe})
+
+@app.route('/criar_pasta', methods=['POST'])
+def criar_pasta():
+    caminho = request.json.get('caminho')
+
+    ftp = FTP('ftp.dominiosistemas.com.br')
+    try:
+        ftp.login(user='suportesc', passwd='pmn7755')
+
+        partes = caminho.strip('/').split('/')
+        atual = ''
+
+        for pasta in partes:
+            atual += f'/{pasta}'
+            try:
+                ftp.cwd(atual)
+            except error_perm:
+                ftp.mkd(atual)
+
+        return jsonify({'sucesso': True})
+
+    except error_perm:
+        return jsonify({'sucesso': False})
+
+    finally:
+        try:
+            ftp.quit()
+        except:
+            pass
 
 @app.route("/envio")
 def envio():
@@ -142,6 +194,15 @@ def gerar_link():
     for subpasta in subpastas:
         if subpasta.strip():
             caminho += f"/{subpasta.strip()}"
+
+    if not caminho_existe_ftp(caminho):
+        unidades = listar_cliente()
+        return render_template(
+            'enviar.html',
+            unidades=unidades,
+            diretorios=[],
+            erro_pasta="A pasta informada não existe. Deseja criar?"
+        )
 
     token = str(uuid.uuid4())
 

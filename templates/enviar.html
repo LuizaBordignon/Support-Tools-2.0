@@ -82,6 +82,19 @@
         </div>
         {% endif %}
 
+        {% if erro_pasta %}
+            <p style="color: red; margin-top: 10px;">
+                {{ erro_pasta }}
+            </p>
+        {% endif %}
+
+        {% if erro_pasta %}
+            <form method="post" action="/criar_pasta">
+                <input type="hidden" name="caminho" value="{{ caminho }}">
+                <button type="submit">Criar pasta</button>
+            </form>
+        {% endif %}
+
     </main>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
