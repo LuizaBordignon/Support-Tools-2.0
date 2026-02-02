@@ -269,6 +269,19 @@ def gerar_link_download():
         if subpasta.strip():
             caminho += f"/{subpasta.strip()}"
 
+    if not caminho_existe_ftp(caminho):
+        diretorios = listar_diretorios_ftp(tipo)
+        unidades = listar_cliente()
+
+        return render_template(
+            'baixar.html',
+            diretorios=diretorios,
+            unidades=unidades,
+            erro_pasta="A pasta informada não existe. Deseja criar?",
+            caminho=caminho,
+            form_data=request.form
+        )
+
     if not arquivo_existe_ftp(caminho, nome_arquivo):
         diretorios = listar_diretorios_ftp(tipo)
         unidades = listar_cliente()
