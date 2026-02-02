@@ -131,3 +131,63 @@ document.querySelector('select[name="tipo"]').addEventListener('change', functio
             });
         });
 });
+
+
+function criarPastaViaJs(btnElement) {
+    const caminho = document.getElementById('caminho-oculto').value;
+    const divResultado = document.getElementById('resultado-criacao');
+    
+    // Efeito visual de carregamento
+    const textoOriginal = btnElement.innerHTML;
+    btnElement.disabled = true;
+    btnElement.innerHTML = "Criando...";
+    divResultado.innerHTML = ""; // Limpa mensagens anteriores
+
+    // Prepara os dados como se fosse um formulário (para o Python entender request.form)
+    const dados = new URLSearchParams();
+    dados.append('caminho', caminho);
+
+    fetch('/criar_pasta', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: dados
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Restaura o botão
+        btnElement.disabled = false;
+        btnElement.innerHTML = textoOriginal;
+
+        if (data.sucesso) {
+            // Sucesso: Mostra mensagem verde e esconde o botão de criar
+            divResultado.innerHTML = `
+                <div class="status-success" style="animation: fadeIn 0.5s ease;">
+                    Pasta criada com sucesso! <br>
+                    <strong>Tente clicar em "Gerar Link" novamente.</strong>
+                </div>
+            `;
+            // Opcional: Esconder o botão de criar pasta após o sucesso para não clicar de novo
+            btnElement.style.display = 'none';
+        } else {
+            // Erro: Mostra mensagem vermelha vinda do Python
+            divResultado.innerHTML = `
+                <div class="status-error" style="animation: fadeIn 0.5s ease;">
+                    Erro: ${data.erro}
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        btnElement.disabled = false;
+        btnElement.innerHTML = textoOriginal;
+        divResultado.innerHTML = `
+            <div class="status-error">
+                Erro de conexão ao tentar criar a pasta.
+            </div>
+        `;
+    });
+}
+

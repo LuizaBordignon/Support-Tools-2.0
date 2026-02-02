@@ -104,11 +104,34 @@ def caminho_existe_ftp(caminho):
     ftp = FTP('ftp.dominiosistemas.com.br')
     try:
         ftp.login(user='suportesc', passwd='pmn7755')
+        ftp.cwd(caminho)
+        return True
     except error_perm:
         return False
     finally:
         try: ftp.quit()
         except: pass
+
+
+def arquivo_existe_ftp(caminho, nome_arquivo):
+    ftp = FTP('ftp.dominiosistemas.com.br')
+    try:
+        ftp.login(user='suportesc', passwd='pmn7755')
+        ftp.set_pasv(True)
+        ftp.voidcmd('TYPE I')
+        ftp.cwd(caminho)
+
+        arquivos = ftp.nlst()
+        return nome_arquivo in arquivos
+
+    except error_perm:
+        return False
+    finally:
+        try:
+            ftp.quit()
+        except:
+            pass
+
 
 # =========================
 # ROTAS
@@ -138,32 +161,37 @@ def verificar_pasta():
 
 @app.route('/criar_pasta', methods=['POST'])
 def criar_pasta():
-    caminho = request.json.get('caminho')
+    caminho = request.form.get('caminho')
+
+    if not caminho:
+        return jsonify({'sucesso': False, 'erro': 'Caminho não informado'})
 
     ftp = FTP('ftp.dominiosistemas.com.br')
     try:
         ftp.login(user='suportesc', passwd='pmn7755')
 
+        ftp.cwd('/')  # garante ponto inicial conhecido
+
         partes = caminho.strip('/').split('/')
-        atual = ''
 
         for pasta in partes:
-            atual += f'/{pasta}'
             try:
-                ftp.cwd(atual)
+                ftp.cwd(pasta)
             except error_perm:
-                ftp.mkd(atual)
+                ftp.mkd(pasta)
+                ftp.cwd(pasta)
 
         return jsonify({'sucesso': True})
 
-    except error_perm:
-        return jsonify({'sucesso': False})
+    except error_perm as e:
+        return jsonify({'sucesso': False, 'erro': str(e)})
 
     finally:
         try:
             ftp.quit()
         except:
             pass
+
 
 @app.route("/envio")
 def envio():
@@ -201,7 +229,8 @@ def gerar_link():
             'enviar.html',
             unidades=unidades,
             diretorios=[],
-            erro_pasta="A pasta informada não existe. Deseja criar?"
+            erro_pasta="A pasta informada não existe. Deseja criar?",
+            caminho=caminho
         )
 
     token = str(uuid.uuid4())
@@ -214,7 +243,7 @@ def gerar_link():
 
     link_cliente = url_for('upload_cliente', token=token, _external=True) #cria o link pro cliente
 
-    diretorios = listar_diretorios_ftp()
+    diretorios = listar_diretorios_ftp(tipo)
     unidades = listar_cliente()
 
     return render_template(
@@ -240,6 +269,18 @@ def gerar_link_download():
         if subpasta.strip():
             caminho += f"/{subpasta.strip()}"
 
+    if not arquivo_existe_ftp(caminho, nome_arquivo):
+        diretorios = listar_diretorios_ftp(tipo)
+        unidades = listar_cliente()
+
+        return render_template(
+            'baixar.html',
+            diretorios=diretorios,
+            unidades=unidades,
+            erro_arquivo="O arquivo informado não existe nesta pasta.",
+            form_data=request.form
+        )
+
     token = str(uuid.uuid4())
 
     salvar_token(
@@ -255,7 +296,7 @@ def gerar_link_download():
         _external=True
     )
 
-    diretorios = listar_diretorios_ftp()
+    diretorios = listar_diretorios_ftp(tipo)
     unidades = listar_cliente()
 
     return render_template(

@@ -667,3 +667,92 @@ progress::-moz-progress-bar {
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
+
+separator-line {
+    background-color: var(--border-color);
+    height: 1px;
+    width: 100%;
+    margin: 20px 0;
+}
+
+/* Container centralizado para mensagens de aviso */
+.warning-container {
+    text-align: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Texto de aviso laranja */
+.warning-msg {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+/* Botão específico para criar pasta (Escuro) */
+.btn-create-folder {
+    background-color: var(--text-color); /* Fundo escuro (#202024) */
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.btn-create-folder:hover {
+    background-color: #000000; /* Fica preto total no hover */
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Área onde a mensagem de sucesso/erro aparece */
+.creation-result {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Adicionando animação nas classes de status que você já tinha */
+.status-success, .status-error {
+    animation: fadeIn 0.5s ease;
+}
+
+/* --- ESTILOS DE ERRO E AVISO --- */
+
+/* Linha separadora suave */
+.separator-line {
+    background-color: var(--border-color);
+    height: 1px;
+    width: 100%;
+    opacity: 0.5;
+}
+
+/* Mensagem de Erro Vermelha (Para Arquivo não encontrado) */
+.error-msg {
+    color: #dc2626; /* Vermelho */
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Espaço entre ícone e texto */
+}
+
+/* Texto auxiliar cinza abaixo do erro */
+.error-subtext {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: 5px;
+    font-weight: 500;
+}
