@@ -15,7 +15,7 @@
         <div class="header">
             <h1>Support Tools 2.0</h1>
             <h2 style="font-size: 1.1rem; color: var(--primary-color); margin-top: 10px;">ENVIAR BACKUP</h2>
-            </div>
+        </div>
 
         {% if sucesso %}
             <div class="upload-container" style="text-align: center; animation: fadeIn 0.5s;">
@@ -23,7 +23,18 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                 </div>
                 <h3 style="color: #202024;">Arquivo Enviado!</h3>
-                <p style="color: #8d8d99; font-size: 0.9rem;">{{ nome_arquivo }} recebido com sucesso.</p>
+                <p style="color: #8d8d99; font-size: 0.9rem; margin-bottom: 20px;">
+                    <strong>{{ nome_arquivo }}</strong> recebido com sucesso.
+                </p>
+
+                <div class="separator-line"></div>
+
+                <a href="{{ url_for('upload_cliente', token=token) }}" class="download-link">
+                    <button class="btn-submit" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; background-color: var(--text-color);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Enviar Outro Arquivo
+                    </button>
+                </a>
             </div>
 
         {% elif erro_fatal %}
@@ -47,30 +58,44 @@
 
         {% else %}
             
-            <div class="file-info-card" style="justify-content: center;">
-                <p style="color: #666; font-size: 0.9rem;">Selecione o arquivo para enviar ao suporte.</p>
+            <div id="area-upload">
+                <div class="file-info-card" style="justify-content: center;">
+                    <p style="color: #666; font-size: 0.9rem;">Selecione o arquivo para enviar ao suporte.</p>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data" style="width: 100%;" onsubmit="ativarLoading()">
+                    
+                    <label class="btn-select-file">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <span id="texto-arquivo">Clique para selecionar</span>
+                        <input type="file" name="arquivo" class="input-hidden" onchange="mostrarNome(this)" required>
+                    </label>
+
+                    <button type="submit" class="btn-submit" style="width: 100%; margin-top: 15px;">
+                        Enviar Arquivo
+                    </button>
+                </form>
             </div>
 
-            <form method="POST" enctype="multipart/form-data" style="width: 100%;">
-                
-                <label class="btn-select-file">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                    <span id="texto-arquivo">Clique para selecionar</span>
-                    <input type="file" name="arquivo" class="input-hidden" onchange="mostrarNome(this)" required>
-                </label>
-
-                <button type="submit" class="btn-submit" style="width: 100%; margin-top: 15px;">
-                    Enviar Arquivo
-                </button>
-            </form>
+            <div id="loading-area" class="loading-area">
+                <div class="spinner"></div>
+                <p class="loading-text">Enviando arquivo, por favor aguarde...</p>
+                <p style="font-size: 0.8rem; color: #999; margin-top: 5px;">Não feche esta página.</p>
+            </div>
 
             <script>
+                // Mostra o nome do arquivo selecionado
                 function mostrarNome(input) {
                     if (input.files && input.files[0]) {
                         document.getElementById('texto-arquivo').innerText = input.files[0].name;
                         document.getElementById('texto-arquivo').style.color = "#202024";
                         document.getElementById('texto-arquivo').style.fontWeight = "600";
                     }
+                }
+                // Esconde o formulário e mostra o spinner
+                function ativarLoading() {
+                    document.getElementById('area-upload').style.display = 'none';
+                    document.getElementById('loading-area').style.display = 'block';
                 }
             </script>
         {% endif %}

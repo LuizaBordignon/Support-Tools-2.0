@@ -216,19 +216,18 @@ def gerar_link():
         if subpasta.strip():
             caminho += f"/{subpasta.strip()}"
 
-    # LÓGICA CORRIGIDA: Se der erro, recarrega a lista de diretórios para o campo não sumir
+    # Recarrega a lista de diretórios se der erro, para não limpar o form
     if not caminho_existe_ftp(caminho):
         unidades = listar_cliente()
-        # Recarrega os diretórios baseado no tipo que o usuário enviou
         diretorios = listar_diretorios_ftp(tipo) 
         
         return render_template(
             'enviar.html',
             unidades=unidades,
-            diretorios=diretorios, # Passa a lista recarregada
+            diretorios=diretorios,
             erro_pasta="A pasta informada não existe. Deseja criar?",
             caminho=caminho,
-            form_data=request.form # Passa os dados para o HTML repopular
+            form_data=request.form 
         )
 
     token = str(uuid.uuid4())
@@ -241,7 +240,7 @@ def gerar_link():
 
     link_cliente = url_for('upload_cliente', token=token, _external=True)
 
-    diretorios = listar_diretorios_ftp(tipo) # Recarrega para o sucesso também
+    diretorios = listar_diretorios_ftp(tipo)
     unidades = listar_cliente()
 
     return render_template(
@@ -276,7 +275,7 @@ def gerar_link_download():
     # ERRO DE PASTA
     if not caminho_existe_ftp(caminho):
         unidades = listar_cliente()
-        diretorios = listar_diretorios_ftp(tipo) # CORREÇÃO: Recarrega lista
+        diretorios = listar_diretorios_ftp(tipo)
         
         return render_template(
             'baixar.html',
@@ -290,7 +289,7 @@ def gerar_link_download():
     # ERRO DE ARQUIVO
     if not arquivo_existe_ftp(caminho, nome_arquivo):
         unidades = listar_cliente()
-        diretorios = listar_diretorios_ftp(tipo) # CORREÇÃO: Recarrega lista
+        diretorios = listar_diretorios_ftp(tipo)
         
         return render_template(
             'baixar.html',
@@ -323,20 +322,24 @@ def gerar_link_download():
         diretorios=diretorios,
         unidades=unidades,
         link=link_cliente,
-        form_data=request.form # Mantém preenchido no sucesso também
+        form_data=request.form 
     )
 
 # =========================
 # ROTAS CLIENTE (UPLOAD/DOWNLOAD)
 # =========================
-# (Mantive suas rotas de cliente atualizadas que fizemos antes)
 
 @app.route('/upload/<token>', methods=['GET', 'POST'])
 def upload_cliente(token):
     dados = buscar_token(token)
     
+    # Validação do Token
     if not dados or dados[0] != "upload":
-        return render_template('upload.html', token=token, erro_fatal="Este link de envio não existe ou expirou.")
+        return render_template(
+            'upload.html',
+            token=token,
+            erro_fatal="Este link de envio não existe ou expirou."
+        )
 
     caminho_ftp = dados[1]
     
@@ -353,25 +356,41 @@ def upload_cliente(token):
 
     try:
         ftp.login(user='suportesc', passwd='pmn7755')
+        
         try:
             ftp.cwd(caminho_ftp)
         except error_perm:
             return render_template('upload.html', token=token, erro_fatal="A pasta de destino não foi encontrada no servidor.")
 
+        # Tenta enviar o arquivo
         try:
+            # === AQUI ESTÁ O QUE VOCÊ PEDIU ===
+            # Tenta deletar o arquivo antes para garantir que sobrescreva sem erro
+            try:
+                ftp.delete(nome_arquivo)
+            except:
+                pass # Se não existir, ignora
+
             ftp.storbinary(f"STOR {nome_arquivo}", arquivo)
+
         except error_perm as e:
+            # Tratamento de erro detalhado para renderizar na tela
             erro = str(e)
-            if "Permission denied" in erro: msg = "Sem permissão para enviar arquivos para este local."
-            elif "Overwrite permission denied" in erro: msg = "Não é permitido sobrescrever arquivos nesta pasta."
-            elif "No such file or directory" in erro: msg = "A pasta de destino não existe. Entre em contato com o suporte."
-            else: msg = f"Erro ao enviar o arquivo: {erro}"
+            if "Permission denied" in erro:
+                msg = "Sem permissão para enviar arquivos para este local."
+            elif "No such file or directory" in erro:
+                msg = "A pasta de destino não existe."
+            else:
+                msg = f"Erro ao enviar o arquivo: {erro}"
+
             return render_template('upload.html', token=token, erro_fatal=msg)
 
+        # Sucesso
         return render_template('upload.html', token=token, sucesso=True, nome_arquivo=nome_arquivo)
 
     except Exception as e:
         return render_template('upload.html', token=token, erro_fatal=f"Erro de conexão: {str(e)}")
+        
     finally:
         try: ftp.quit()
         except: pass
