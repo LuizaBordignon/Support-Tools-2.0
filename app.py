@@ -14,9 +14,9 @@ def init_db():
         CREATE TABLE IF NOT EXISTS atendimentos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             token TEXT UNIQUE,
-            tipo TEXT,               -- upload ou download
+            tipo TEXT,              -- upload ou download
             caminho TEXT,
-            arquivo TEXT,            -- nome do arquivo (só para download)
+            arquivo TEXT,           -- nome do arquivo (só para download)
             criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     """)
@@ -66,38 +66,40 @@ def listar_cliente():
 
     ftp.cwd('/') #raiz
     itens = []
-    ftp.dir(itens.append) #adiciona os itens que estão no diretorio na lista
+    ftp.dir(itens.append) 
     ftp.quit()
 
     unidades = []
     for linha in itens:
-        if linha.startswith('d'): #se nos itens começar com D, é uma pasta (diretorio)
-            unidades.append(linha.split()[-1]) #coleta só o nome das unidades, a última parte da linha
+        if linha.startswith('d'): 
+            unidades.append(linha.split()[-1]) 
 
     return unidades
 
 
 def listar_diretorios_ftp(tipo):
-    ftp = FTP('ftp.dominiosistemas.com.br')
-    ftp.login(user='suportesc', passwd='pmn7755')
+    if not tipo: return []
+    try:
+        ftp = FTP('ftp.dominiosistemas.com.br')
+        ftp.login(user='suportesc', passwd='pmn7755')
 
-    ftp.cwd(f'/{tipo}')
-    itens = []
-    ftp.dir(itens.append)
-    ftp.quit()
+        ftp.cwd(f'/{tipo}')
+        itens = []
+        ftp.dir(itens.append)
+        ftp.quit()
 
-    diretorios = []
-    for linha in itens:
-        if linha.startswith('d'):
-            nome = linha.split()[-1]
-
-            if nome not in ('.', '..'):
-                diretorios.append(nome)
-
-    return diretorios
+        diretorios = []
+        for linha in itens:
+            if linha.startswith('d'):
+                nome = linha.split()[-1]
+                if nome not in ('.', '..'):
+                    diretorios.append(nome)
+        return diretorios
+    except:
+        return []
 
 # =========================
-# FUNÇÕES
+# FUNÇÕES DE VERIFICAÇÃO
 # =========================
 
 def caminho_existe_ftp(caminho):
@@ -133,10 +135,8 @@ def arquivo_existe_ftp(caminho, nome_arquivo):
         except:
             pass
 
-
-
 # =========================
-# ROTAS
+# ROTAS DE PÁGINAS
 # =========================
 
 @app.route("/")
@@ -154,26 +154,21 @@ def listar_por_tipo(tipo):
 @app.route('/verificar_pasta', methods=['POST'])
 def verificar_pasta():
     caminho = request.json.get('caminho')
-
     if not caminho:
         return jsonify({'existe': False})
-    
     existe = caminho_existe_ftp(caminho)
     return jsonify({'existe': existe})
 
 @app.route('/criar_pasta', methods=['POST'])
 def criar_pasta():
     caminho = request.form.get('caminho')
-
     if not caminho:
         return jsonify({'sucesso': False, 'erro': 'Caminho não informado'})
 
     ftp = FTP('ftp.dominiosistemas.com.br')
     try:
         ftp.login(user='suportesc', passwd='pmn7755')
-
-        ftp.cwd('/')  # garante ponto inicial conhecido
-
+        ftp.cwd('/') 
         partes = caminho.strip('/').split('/')
 
         for pasta in partes:
@@ -184,20 +179,16 @@ def criar_pasta():
                 ftp.cwd(pasta)
 
         return jsonify({'sucesso': True})
-
     except error_perm as e:
         return jsonify({'sucesso': False, 'erro': str(e)})
-
     finally:
-        try:
-            ftp.quit()
-        except:
-            pass
+        try: ftp.quit()
+        except: pass
 
 
 @app.route("/envio")
 def envio():
-    unidades = listar_cliente()  # raiz: clientes, unidades, etc
+    unidades = listar_cliente() 
     return render_template('enviar.html', unidades=unidades, diretorios=[])
 
 @app.route("/baixar")
@@ -207,7 +198,7 @@ def baixar():
 
 
 # =========================
-# GERAÇÃO DE LINK
+# GERAÇÃO DE LINK (ENVIO)
 # =========================
 
 @app.route('/gerar_link', methods=['POST'])
@@ -225,14 +216,19 @@ def gerar_link():
         if subpasta.strip():
             caminho += f"/{subpasta.strip()}"
 
+    # LÓGICA CORRIGIDA: Se der erro, recarrega a lista de diretórios para o campo não sumir
     if not caminho_existe_ftp(caminho):
         unidades = listar_cliente()
+        # Recarrega os diretórios baseado no tipo que o usuário enviou
+        diretorios = listar_diretorios_ftp(tipo) 
+        
         return render_template(
             'enviar.html',
             unidades=unidades,
-            diretorios=[],
+            diretorios=diretorios, # Passa a lista recarregada
             erro_pasta="A pasta informada não existe. Deseja criar?",
-            caminho=caminho
+            caminho=caminho,
+            form_data=request.form # Passa os dados para o HTML repopular
         )
 
     token = str(uuid.uuid4())
@@ -241,19 +237,25 @@ def gerar_link():
         token=token,
         tipo="upload",
         caminho=caminho
-    ) #envia info para o sqlite, para criar o token para aquele caminho em questão
+    )
 
-    link_cliente = url_for('upload_cliente', token=token, _external=True) #cria o link pro cliente
+    link_cliente = url_for('upload_cliente', token=token, _external=True)
 
-    diretorios = listar_diretorios_ftp(tipo)
+    diretorios = listar_diretorios_ftp(tipo) # Recarrega para o sucesso também
     unidades = listar_cliente()
 
     return render_template(
         'enviar.html',
         diretorios=diretorios,
         unidades=unidades,
-        link=link_cliente
+        link=link_cliente,
+        form_data=request.form
     )
+
+
+# =========================
+# GERAÇÃO DE LINK (DOWNLOAD)
+# =========================
 
 @app.route('/gerar_link_download', methods=['POST'])
 def gerar_link_download():
@@ -271,10 +273,11 @@ def gerar_link_download():
         if subpasta.strip():
             caminho += f"/{subpasta.strip()}"
 
+    # ERRO DE PASTA
     if not caminho_existe_ftp(caminho):
-        diretorios = listar_diretorios_ftp(tipo)
         unidades = listar_cliente()
-
+        diretorios = listar_diretorios_ftp(tipo) # CORREÇÃO: Recarrega lista
+        
         return render_template(
             'baixar.html',
             diretorios=diretorios,
@@ -284,10 +287,11 @@ def gerar_link_download():
             form_data=request.form
         )
 
+    # ERRO DE ARQUIVO
     if not arquivo_existe_ftp(caminho, nome_arquivo):
-        diretorios = listar_diretorios_ftp(tipo)
         unidades = listar_cliente()
-
+        diretorios = listar_diretorios_ftp(tipo) # CORREÇÃO: Recarrega lista
+        
         return render_template(
             'baixar.html',
             diretorios=diretorios,
@@ -318,111 +322,68 @@ def gerar_link_download():
         'baixar.html',
         diretorios=diretorios,
         unidades=unidades,
-        link=link_cliente
+        link=link_cliente,
+        form_data=request.form # Mantém preenchido no sucesso também
     )
 
 # =========================
-# UPLOAD DO CLIENTE
+# ROTAS CLIENTE (UPLOAD/DOWNLOAD)
 # =========================
+# (Mantive suas rotas de cliente atualizadas que fizemos antes)
 
 @app.route('/upload/<token>', methods=['GET', 'POST'])
 def upload_cliente(token):
-    dados = buscar_token(token) #verifica se existe o token 
+    dados = buscar_token(token)
     
     if not dados or dados[0] != "upload":
-            return jsonify({
-                "success": False,
-                "message": "Link inválido."
-            }), 404
+        return render_template('upload.html', token=token, erro_fatal="Este link de envio não existe ou expirou.")
 
+    caminho_ftp = dados[1]
+    
     if request.method == 'GET':
-        return render_template('upload.html')
+        return render_template('upload.html', token=token, caminho_destino=caminho_ftp)
 
-    arquivo = request.files.get('arquivo') # coleta o arquivo enviado via navegador
-
+    arquivo = request.files.get('arquivo')
+    
     if not arquivo:
-        return jsonify({
-            "success": False,
-            "message": "Nenhum arquivo enviado."
-        }), 400
+        return render_template('upload.html', token=token, erro_fatal="Nenhum arquivo foi selecionado.")
 
-    caminho_ftp = dados[1] #recupera o caminho do ftp salvo no sqlite
-    nome_arquivo = arquivo.filename #coleta o nome do arquivo
-
+    nome_arquivo = arquivo.filename
     ftp = FTP('ftp.dominiosistemas.com.br')
 
     try:
         ftp.login(user='suportesc', passwd='pmn7755')
-
-        # tenta acessar a pasta
         try:
             ftp.cwd(caminho_ftp)
         except error_perm:
-            return jsonify({
-                "success": False,
-                "message": "A pasta de destino não existe. Entre em contato com o suporte."
-            }), 400
+            return render_template('upload.html', token=token, erro_fatal="A pasta de destino não foi encontrada no servidor.")
 
-        # tenta apagar arquivo existente (sobrescrever)
         try:
-            ftp.delete(nome_arquivo)
-        except error_perm:
-            pass
+            ftp.storbinary(f"STOR {nome_arquivo}", arquivo)
+        except error_perm as e:
+            erro = str(e)
+            if "Permission denied" in erro: msg = "Sem permissão para enviar arquivos para este local."
+            elif "Overwrite permission denied" in erro: msg = "Não é permitido sobrescrever arquivos nesta pasta."
+            elif "No such file or directory" in erro: msg = "A pasta de destino não existe. Entre em contato com o suporte."
+            else: msg = f"Erro ao enviar o arquivo: {erro}"
+            return render_template('upload.html', token=token, erro_fatal=msg)
 
-        ftp.storbinary(f"STOR {nome_arquivo}", arquivo) 
+        return render_template('upload.html', token=token, sucesso=True, nome_arquivo=nome_arquivo)
 
-        # storbinary: Comando do FTP para enviar binarios.
-        # "STOR nome": O comando FTP.
-        # arquivo: O conteúdo do arquivo que veio do navegador.
-
-        return jsonify({
-            "success": True,
-            "message": "Upload realizado com sucesso."
-        }), 200
-
-    except error_perm as e:
-        erro = str(e)
-
-        if "Permission denied" in erro:
-            msg = "Sem permissão para enviar arquivos para este local."
-        elif "Overwrite permission denied" in erro:
-            msg = "Não é permitido sobrescrever arquivos nesta pasta."
-        elif "No such file or directory" in erro:
-            msg = "A pasta de destino não existe. Entre em contato com o suporte."
-        else:
-            msg = "Erro ao enviar o arquivo para o servidor."
-
-        return jsonify({
-            "success": False,
-            "message": msg
-        }), 400
-
-    except Exception:
-        return jsonify({
-            "success": False,
-            "message": "Erro inesperado no servidor."
-        }), 500
-
+    except Exception as e:
+        return render_template('upload.html', token=token, erro_fatal=f"Erro de conexão: {str(e)}")
     finally:
-        try:
-            ftp.quit()
-        except:
-            pass
-
-# =========================
-# DOWNLOAD DO CLIENTE
-# =========================
+        try: ftp.quit()
+        except: pass
 
 @app.route('/download/<token>', methods=['GET'])
 def download_cliente(token):
     dados = buscar_token(token)
-    if not dados or dados[0] != "download": 
-        # Se o token for inválido, renderizamos a pag de erro tbm, mas sem nome de arquivo
+    if not dados or dados[0] != "download":
         return render_template('download.html', erro_fatal="Link inválido ou expirado.", token=token, nome_arquivo="Desconhecido")
     
     caminho_ftp = dados[1].rstrip('/') 
     nome_arquivo = dados[2]
-
     ftp = FTP('ftp.dominiosistemas.com.br')
 
     try:
@@ -430,28 +391,11 @@ def download_cliente(token):
         ftp.set_pasv(True) 
         ftp.voidcmd('TYPE I') 
 
-        try:
-            ftp.cwd(caminho_ftp)
-        except error_perm:
-            # ERRO 1: A pasta sumiu
-            return render_template(
-                'download.html', 
-                token=token, 
-                nome_arquivo=nome_arquivo,
-                erro_fatal="A pasta deste arquivo não existe mais no servidor."
-            )
+        try: ftp.cwd(caminho_ftp)
+        except error_perm: return render_template('download.html', token=token, nome_arquivo=nome_arquivo, erro_fatal="A pasta deste arquivo não existe mais no servidor.")
 
-        # Tenta pegar o tamanho apenas para verificar existencia antes de abrir stream
-        try:
-            ftp.size(nome_arquivo)
-        except error_perm:
-             # ERRO 2: O arquivo sumiu (Erro 550)
-             return render_template(
-                'download.html', 
-                token=token, 
-                nome_arquivo=nome_arquivo,
-                erro_fatal="O arquivo foi excluído ou movido do servidor."
-            )
+        try: ftp.size(nome_arquivo)
+        except error_perm: return render_template('download.html', token=token, nome_arquivo=nome_arquivo, erro_fatal="O arquivo foi excluído ou movido do servidor.")
 
         caminho_completo = f"{caminho_ftp}/{nome_arquivo}"
         conn = ftp.transfercmd(f"RETR {caminho_completo}") 
@@ -460,8 +404,7 @@ def download_cliente(token):
             try:
                 while True:
                     bloco = conn.recv(65536) 
-                    if not bloco:
-                        break 
+                    if not bloco: break 
                     yield bloco 
             finally:
                 try: conn.close()
@@ -469,34 +412,21 @@ def download_cliente(token):
                 try: ftp.quit()
                 except: pass
 
-        response = Response(
-            stream_with_context(gerar()),
-            mimetype='application/octet-stream'
-        )
-
-        response.headers['Content-Disposition'] = (
-            f'attachment; filename="{nome_arquivo}"'
-        )
+        response = Response(stream_with_context(gerar()), mimetype='application/octet-stream')
+        response.headers['Content-Disposition'] = f'attachment; filename="{nome_arquivo}"'
         return response
 
     except Exception as e:
-        # Erros genéricos de conexão
-        return render_template(
-            'download.html', 
-            token=token, 
-            nome_arquivo=nome_arquivo,
-            erro_fatal=f"Erro de conexão com o servidor: {str(e)}"
-        )
-    
+        return render_template('download.html', token=token, nome_arquivo=nome_arquivo, erro_fatal=f"Erro de conexão com o servidor: {str(e)}")
+
 @app.route('/download_link/<token>', methods=['GET'])
 def pagina_download_cliente(token):
     dados = buscar_token(token)
     if not dados or dados[0] != "download":
-        return "Link inválido.", 404
+        return render_template("download.html", nome_arquivo="Link Inválido", erro_fatal="Este link não existe ou foi digitado incorretamente.", token=token)
 
     caminho_ftp = dados[1].rstrip('/')
     nome_arquivo = dados[2]
-
     ftp = FTP('ftp.dominiosistemas.com.br')
     tamanho = None
 
@@ -504,29 +434,19 @@ def pagina_download_cliente(token):
         ftp.login(user='suportesc', passwd='pmn7755')
         ftp.set_pasv(True)
         ftp.voidcmd('TYPE I')
-        ftp.cwd(caminho_ftp)
-
         try:
+            ftp.cwd(caminho_ftp)
             tamanho = ftp.size(nome_arquivo)
-        except:
-            tamanho = None
+        except: tamanho = None
     finally:
-        try:
-            ftp.quit()
-        except:
-            pass
+        try: ftp.quit()
+        except: pass
 
     tamanho_mb = round(tamanho / (1024 * 1024), 1) if tamanho else None
-    return render_template(
-        "download.html",
-        nome_arquivo=nome_arquivo,
-        tamanho_mb=tamanho_mb,
-        token=token
-    )
-    
-# =========================
-# MAIN
-# =========================
+    msg_erro = None
+    if tamanho is None: msg_erro = "O arquivo não foi encontrado no servidor."
+
+    return render_template("download.html", nome_arquivo=nome_arquivo, tamanho_mb=tamanho_mb, token=token, erro_fatal=msg_erro)
 
 if __name__ == "__main__":
     app.run(debug=True)
