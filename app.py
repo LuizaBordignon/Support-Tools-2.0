@@ -357,6 +357,10 @@ def upload_cliente(token):
     try:
         ftp.login(user='suportesc', passwd='pmn7755')
         
+        # MODO BINÁRIO E PASSIVO OBRIGATÓRIO
+        ftp.set_pasv(True)
+        ftp.voidcmd('TYPE I') 
+
         try:
             ftp.cwd(caminho_ftp)
         except error_perm:
@@ -364,17 +368,22 @@ def upload_cliente(token):
 
         # Tenta enviar o arquivo
         try:
-            # === AQUI ESTÁ O QUE VOCÊ PEDIU ===
-            # Tenta deletar o arquivo antes para garantir que sobrescreva sem erro
+            # Tenta deletar o arquivo antes para garantir que sobrescreva
             try:
                 ftp.delete(nome_arquivo)
             except:
-                pass # Se não existir, ignora
+                pass 
 
-            ftp.storbinary(f"STOR {nome_arquivo}", arquivo)
+            # === AQUI ESTÁ A CORREÇÃO PRINCIPAL ===
+            # Força o ponteiro do arquivo para o início (byte 0)
+            # para garantir que ele não envie um arquivo vazio se já tiver sido lido antes
+            arquivo.stream.seek(0)
+            
+            # Usa .stream para garantir que o FTP leia o fluxo de dados corretamente
+            ftp.storbinary(f"STOR {nome_arquivo}", arquivo.stream)
 
         except error_perm as e:
-            # Tratamento de erro detalhado para renderizar na tela
+            # Tratamento de erro detalhado
             erro = str(e)
             if "Permission denied" in erro:
                 msg = "Sem permissão para enviar arquivos para este local."
