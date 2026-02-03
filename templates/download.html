@@ -15,7 +15,10 @@
         <div class="header">
             <h1>Support Tools 2.0</h1>
             <h2 style="font-size: 1.1rem; color: var(--primary-color); margin-top: 10px;">BAIXAR BACKUP</h2>
-            <p>Prezado cliente, o arquivo está pronto. Clique abaixo para iniciar o download.</p>
+            
+            {% if not erro_fatal %}
+                <p>Prezado cliente, o arquivo está pronto. Clique abaixo para iniciar o download.</p>
+            {% endif %}
         </div>
 
         <div class="file-info-card">
@@ -24,23 +27,49 @@
             </div>
             
             <div class="file-details">
-                <span class="label">Arquivo disponível:</span>
+                <span class="label">Arquivo solicitado:</span>
                 <span class="filename" title="{{ nome_arquivo }}">{{ nome_arquivo }}</span>
                 
                 {% if tamanho_mb %}
-                <span class="filesize">Tamanho: {{ tamanho_mb }} MB</span>
+                <span class="filesize">Tamanho estimado: {{ tamanho_mb }} MB</span>
                 {% endif %}
             </div>
         </div>
 
-        <a href="{{ url_for('download_cliente', token=token) }}" class="download-link">
-            <button class="btn-submit" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                Baixar Agora
-            </button>
-        </a>
-        
+        <div class="separator-line"></div>
 
+        {% if erro_fatal %}
+            
+            <div class="upload-container warning-container" style="animation: fadeIn 0.5s ease;">
+                <div class="error-msg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                    Falha no Download
+                </div>
+                <p class="error-subtext">{{ erro_fatal }}</p>
+
+                <a href="{{ url_for('pagina_download_cliente', token=token) }}" class="download-link">
+                    <button class="btn btn-primary btn-retry">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 4v6h-6"></path>
+                            <path d="M1 20v-6h6"></path>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                        </svg>
+                        Tentar Novamente
+                    </button>
+                </a>
+            </div>
+
+        {% else %}
+
+            <a href="{{ url_for('download_cliente', token=token) }}" class="download-link">
+                <button class="btn-submit" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Baixar Agora
+                </button>
+            </a>
+
+        {% endif %}
+        
     </main>
 
 </body>

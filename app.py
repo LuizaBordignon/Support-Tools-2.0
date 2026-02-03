@@ -121,16 +121,18 @@ def arquivo_existe_ftp(caminho, nome_arquivo):
         ftp.voidcmd('TYPE I')
         ftp.cwd(caminho)
 
-        arquivos = ftp.nlst()
-        return nome_arquivo in arquivos
+        try:
+            ftp.size(nome_arquivo)
+            return True
+        except error_perm:
+            return False
 
-    except error_perm:
-        return False
     finally:
         try:
             ftp.quit()
         except:
             pass
+
 
 
 # =========================
@@ -414,63 +416,77 @@ def upload_cliente(token):
 @app.route('/download/<token>', methods=['GET'])
 def download_cliente(token):
     dados = buscar_token(token)
-    if not dados or dados[0] != "download": #erro para tokens inválidos
-        return "Link inválido.", 404
+    if not dados or dados[0] != "download": 
+        # Se o token for inválido, renderizamos a pag de erro tbm, mas sem nome de arquivo
+        return render_template('download.html', erro_fatal="Link inválido ou expirado.", token=token, nome_arquivo="Desconhecido")
     
-    caminho_ftp = dados[1].rstrip('/') #remove se tiver uma barra no final 
+    caminho_ftp = dados[1].rstrip('/') 
     nome_arquivo = dados[2]
 
     ftp = FTP('ftp.dominiosistemas.com.br')
 
     try:
         ftp.login(user='suportesc', passwd='pmn7755')
-        ftp.set_pasv(True) #modo passivo, evita bloqueios de firewall
-        ftp.voidcmd('TYPE I') #força o modo binário para nao corromper zips e exes
+        ftp.set_pasv(True) 
+        ftp.voidcmd('TYPE I') 
 
         try:
             ftp.cwd(caminho_ftp)
         except error_perm:
-            return f"Pasta não encontrada: {caminho_ftp}", 400
+            # ERRO 1: A pasta sumiu
+            return render_template(
+                'download.html', 
+                token=token, 
+                nome_arquivo=nome_arquivo,
+                erro_fatal="A pasta deste arquivo não existe mais no servidor."
+            )
 
+        # Tenta pegar o tamanho apenas para verificar existencia antes de abrir stream
         try:
-            tamanho = ftp.size(nome_arquivo)
-        except:
-            tamanho = None
+            ftp.size(nome_arquivo)
+        except error_perm:
+             # ERRO 2: O arquivo sumiu (Erro 550)
+             return render_template(
+                'download.html', 
+                token=token, 
+                nome_arquivo=nome_arquivo,
+                erro_fatal="O arquivo foi excluído ou movido do servidor."
+            )
 
-        conn = ftp.transfercmd(f"RETR {nome_arquivo}") #abre a conexão para baixar o arquivo
+        caminho_completo = f"{caminho_ftp}/{nome_arquivo}"
+        conn = ftp.transfercmd(f"RETR {caminho_completo}") 
 
         def gerar():
             try:
                 while True:
-                    bloco = conn.recv(65536)  # 64 KB #le um pedaço de 64kb do ftp
+                    bloco = conn.recv(65536) 
                     if not bloco:
-                        break #se não tiver, acabou o arquivo
-                    yield bloco  #o yield entrega esse pedaço para o navegador no momento do download
+                        break 
+                    yield bloco 
             finally:
-                try:
-                    conn.close()
-                except:
-                    pass
-                try:
-                    ftp.quit()
-                except:
-                    pass
+                try: conn.close()
+                except: pass
+                try: ftp.quit()
+                except: pass
 
         response = Response(
             stream_with_context(gerar()),
-            mimetype='application/octet-stream' #diz ao navegador que é um arquivo binário generico
+            mimetype='application/octet-stream'
         )
 
         response.headers['Content-Disposition'] = (
-            f'attachment; filename="{nome_arquivo}"' #configuração para o navegador selecionar o caminho p baixar
+            f'attachment; filename="{nome_arquivo}"'
         )
-        return response #download começa aqui
-
-    except error_perm as e:
-        return f"Erro FTP: {str(e)}", 404
+        return response
 
     except Exception as e:
-        return f"Erro inesperado: {str(e)}", 500
+        # Erros genéricos de conexão
+        return render_template(
+            'download.html', 
+            token=token, 
+            nome_arquivo=nome_arquivo,
+            erro_fatal=f"Erro de conexão com o servidor: {str(e)}"
+        )
     
 @app.route('/download_link/<token>', methods=['GET'])
 def pagina_download_cliente(token):

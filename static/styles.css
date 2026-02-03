@@ -756,3 +756,22 @@ separator-line {
     margin-top: 5px;
     font-weight: 500;
 }
+
+/* --- BOTÃO TENTAR NOVAMENTE E LINKS --- */
+
+/* Garante que o link ocupe a largura total do container */
+.download-link {
+    text-decoration: none;
+    width: 100%;
+    display: block; /* Essencial para o width: 100% funcionar corretamente */
+}
+
+/* Classe específica para o botão de tentar novamente */
+.btn-retry {
+    width: 100%;
+    margin: 15px auto 0 auto; 
+    display: flex;       
+    align-items: center; 
+    justify-content: center; 
+    gap: 10px; 
+}
