@@ -1,3 +1,6 @@
+/* ============================================================
+   1. VARIÁVEIS E CONFIGURAÇÕES GERAIS
+   ============================================================ */
 :root {
     --primary-color: #FF6B35;   
     --primary-hover: #e55a2b;
@@ -25,6 +28,9 @@ body {
     padding: 20px 20px;
 }
 
+/* ============================================================
+   2. TELA INICIAL (CONTAINER E BOTÕES PRINCIPAIS)
+   ============================================================ */
 .container {
     background-color: var(--card-bg);
     width: 90%;
@@ -73,7 +79,6 @@ body {
     justify-content: center;
     align-items: center;
 }
-
 
 .actions a {
     text-decoration: none;
@@ -136,7 +141,9 @@ body {
     }
 }
 
-/* CONFIGURAÇÕES GERAIS */
+/* ============================================================
+   3. CONFIGURAÇÕES DA TELA DE FORMULÁRIO (GERAR LINK)
+   ============================================================ */
 :root {
     --primary-color: #FF6B35;
     --primary-hover: #e55a2b;
@@ -148,24 +155,6 @@ body {
     --input-bg: #f2f2f5;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
-
-body {
-    background-color: var(--dark-bg);
-    background-image: radial-gradient(circle at top right, #2a2a2a 0%, #121214 100%);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-}
-
-/* --- O CARTÃO --- */
 .card {
     background-color: var(--card-bg);
     width: 100%;
@@ -180,7 +169,6 @@ body {
     overflow: hidden;
 }
 
-/* Linha colorida no topo */
 .card-line {
     position: absolute;
     top: 0;
@@ -190,7 +178,6 @@ body {
     background: linear-gradient(90deg, var(--primary-color), #ff9e75);
 }
 
-/* --- CABEÇALHO --- */
 .header {
     text-align: center;
     margin-top: 10px;
@@ -208,7 +195,6 @@ body {
     margin-top: 5px;
 }
 
-/* --- BOTÃO VOLTAR --- */
 #btn-voltar {
     align-self: flex-start;
     background: none;
@@ -227,7 +213,6 @@ body {
     color: var(--primary-color);
 }
 
-/* --- FORMULÁRIO --- */
 .form-grid {
     display: flex;
     flex-direction: column;
@@ -247,7 +232,6 @@ body {
     margin-left: 4px;
 }
 
-/* Estilo dos Inputs e Selects */
 .form-control {
     width: 100%;
     padding: 12px 16px;
@@ -266,13 +250,10 @@ body {
     box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1);
 }
 
-/* Inputs dinâmicos (subpastas adicionadas) */
 .grupo-input-wrapper {
     margin-bottom: 8px;
 }
 
-/* --- BOTÕES --- */
-/* Botão Pequeno de Adicionar (+) */
 .btn-add-field {
     background: none;
     border: 1px dashed var(--primary-color);
@@ -290,7 +271,6 @@ body {
     background-color: rgba(255, 107, 53, 0.05);
 }
 
-/* Botão Principal (Gerar Link) */
 .btn-submit {
     background-color: var(--primary-color);
     color: white;
@@ -311,7 +291,9 @@ body {
     box-shadow: 0 12px 25px rgba(255, 107, 53, 0.35);
 }
 
-/* --- ÁREA DE RESULTADO (LINK) --- */
+/* ============================================================
+   4. ÁREA DE RESULTADO (LINK COPIÁVEL)
+   ============================================================ */
 .result-box {
     background-color: #f0fdf4;
     border: 1px solid #bbf7d0;
@@ -321,7 +303,7 @@ body {
 }
 
 .result-label {
-    color: #15803d; /* Verde escuro */
+    color: #15803d; 
     font-weight: 600;
     font-size: 0.9rem;
     margin-bottom: 8px;
@@ -365,14 +347,9 @@ body {
     display: none;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* --- ESTILO PARA CAMPOS DINÂMICOS (SUBPASTAS) --- */
-
-/* O container de cada nova linha (Input + Botão Remover) */
+/* ============================================================
+   5. CAMPOS DINÂMICOS E SUBPASTAS
+   ============================================================ */
 .dynamic-row {
     display: flex;
     gap: 10px; 
@@ -385,7 +362,6 @@ body {
     flex: 1;
 }
 
-/* O botão de remover (X ou -) */
 .btn-remove {
     background-color: #ffe5e5; 
     color: #cc0000; 
@@ -407,13 +383,9 @@ body {
     transform: scale(1.05);
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* --- ESTILOS DA TELA DE UPLOAD --- */
-
+/* ============================================================
+   6. TELA DE UPLOAD (BOTÃO SELECIONAR E ARQUIVOS)
+   ============================================================ */
 .upload-container {
     display: flex;
     flex-direction: column;
@@ -427,7 +399,6 @@ body {
     display: none;
 }
 
-/* Estilo do Botão "Selecionar Arquivo" (Parece o botão laranja da imagem) */
 .btn-select-file {
     background-color: rgba(255, 107, 53, 0.1); 
     border: 2px dashed var(--primary-color);
@@ -456,7 +427,9 @@ body {
     margin-bottom: 10px;
 }
 
-/* --- BARRA DE PROGRESSO --- */
+/* ============================================================
+   7. BARRA DE PROGRESSO E LOADING
+   ============================================================ */
 .progress-area {
     width: 100%;
     margin-top: 10px;
@@ -470,7 +443,6 @@ body {
     margin-bottom: 5px;
 }
 
-/* Estilizando a tag <progress> */
 progress {
     width: 100%;
     height: 10px;
@@ -481,34 +453,32 @@ progress {
     overflow: hidden;
 }
 
-/* Fundo da barra */
 progress::-webkit-progress-bar {
     background-color: #f0f0f5;
     border-radius: 10px;
 }
 
-/* A parte colorida (enchimento) */
 progress::-webkit-progress-value {
     background: linear-gradient(90deg, var(--primary-color), #ff9e75);
     border-radius: 10px;
     transition: width 0.3s ease;
 }
 
-/* Para Firefox */
 progress::-moz-progress-bar {
     background: linear-gradient(90deg, var(--primary-color), #ff9e75);
     border-radius: 10px;
 }
-/* --- TELA DE DOWNLOAD DO CLIENTE --- */
 
-/* O cartão cinza onde ficam os dados do arquivo */
+/* ============================================================
+   8. TELA DE DOWNLOAD E INFO DO ARQUIVO
+   ============================================================ */
 .file-info-card {
-    background-color: #f8f9fa; /* Cinza bem clarinho */
+    background-color: #f8f9fa; 
     border: 1px solid #e9ecef;
     border-radius: 12px;
     padding: 20px;
     width: 100%;
-    margin: 20px 0;
+    margin: 10px 0;
     display: flex;
     align-items: center;
     gap: 20px;
@@ -516,28 +486,26 @@ progress::-moz-progress-bar {
 }
 
 .file-info-card:hover {
-    border-color: var(--primary-color); /* Fica laranjinha a borda quando passa o mouse */
+    border-color: var(--primary-color); 
     background-color: #fff;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
-/* O ícone do arquivo */
 .icon-wrapper {
     background-color: rgba(255, 107, 53, 0.1);
     color: var(--primary-color);
     padding: 12px;
-    border-radius: 50%; /* Faz ficar redondo */
+    border-radius: 50%; 
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* Textos do arquivo */
 .file-details {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    overflow: hidden; /* Evita que nome gigante quebre o layout */
+    overflow: hidden; 
 }
 
 .file-details .label {
@@ -554,8 +522,8 @@ progress::-moz-progress-bar {
     font-size: 1rem;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* Coloca "..." se o nome for muito grande */
-    max-width: 250px; /* Limita a largura em telas pequenas */
+    text-overflow: ellipsis; 
+    max-width: 250px; 
 }
 
 .file-details .filesize {
@@ -572,31 +540,27 @@ progress::-moz-progress-bar {
     display: inline-block;
     width: 6px;
     height: 6px;
-    background-color: #2ecc71; /* Bolinha verde para dizer que está OK */
+    background-color: #2ecc71; 
     border-radius: 50%;
 }
 
-/* Link que envolve o botão */
 .download-link {
     text-decoration: none;
     width: 100%;
 }
 
-/* --- CORREÇÃO DE ROLAGEM (SCROLL) --- */
-
-/* 1. Limita a altura da lista de campos e cria rolagem interna */
+/* ============================================================
+   9. SCROLL E LISTA DE CAMPOS
+   ============================================================ */
 #lista-campos {
-    max-height: 250px; /* Altura máxima (aprox 4 ou 5 campos) */
-    overflow-y: auto;  /* Cria a barra de rolagem vertical se passar da altura */
-    padding-right: 10px; /* Espaço para não colar o texto na barra */
+    max-height: 250px; 
+    overflow-y: auto;  
+    padding-right: 10px; 
     margin-bottom: 15px;
-    
-    /* Estilizando a barra de rolagem para ficar bonita (Webkit/Chrome) */
-    scrollbar-width: thin; /* Para Firefox */
+    scrollbar-width: thin; 
     scrollbar-color: var(--primary-color) #f2f2f5;
 }
 
-/* Design da barra de rolagem no Chrome/Edge/Safari */
 #lista-campos::-webkit-scrollbar {
     width: 6px;
 }
@@ -612,13 +576,15 @@ progress::-moz-progress-bar {
 }
 
 #lista-campos::-webkit-scrollbar-thumb:hover {
-    background-color: var(--primary-color); /* Fica laranja ao passar o mouse */
+    background-color: var(--primary-color); 
 }
 
-/* Classes de status para a caixa de mensagem */
+/* ============================================================
+   10. STATUS, SPINNER E MENSAGENS
+   ============================================================ */
 .status-success {
     display: block !important;
-    background-color: #d1fae5; /* Verde claro */
+    background-color: #d1fae5; 
     border: 1px solid #34d399;
     color: #065f46;
     padding: 15px;
@@ -630,7 +596,7 @@ progress::-moz-progress-bar {
 
 .status-error {
     display: block !important;
-    background-color: #fee2e2; /* Vermelho claro */
+    background-color: #fee2e2; 
     border: 1px solid #f87171;
     color: #991b1b;
     padding: 15px;
@@ -641,7 +607,7 @@ progress::-moz-progress-bar {
 }
 
 .loading-area {
-    display: none; /* Começa oculto */
+    display: none; 
     text-align: center;
     margin-top: 0px;
     animation: fadeIn 0.5s ease;
@@ -650,10 +616,10 @@ progress::-moz-progress-bar {
 .spinner {
     width: 40px;
     height: 40px;
-    border: 4px solid rgba(255, 107, 53, 0.2); /* Cor laranja clara no fundo */
-    border-left-color: var(--primary-color); /* Cor laranja forte girando */
+    border: 4px solid rgba(255, 107, 53, 0.2); 
+    border-left-color: var(--primary-color); 
     border-radius: 50%;
-    margin: 0 auto 15px auto; /* Centraliza e dá espaço em baixo */
+    margin: 0 auto 15px auto; 
     animation: spin 1s linear infinite;
 }
 
@@ -668,14 +634,15 @@ progress::-moz-progress-bar {
     to { transform: rotate(360deg); }
 }
 
-separator-line {
-    background-color: var(--border-color);
-    height: 1px;
-    width: 100%;
-    margin: 20px 0;
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* Container centralizado para mensagens de aviso */
+/* ============================================================
+   11. OUTROS (ALERTAS E SEPARADORES)
+   ============================================================ */
+
 .warning-container {
     text-align: center;
     width: 100%;
@@ -685,16 +652,14 @@ separator-line {
     gap: 15px;
 }
 
-/* Texto de aviso laranja */
 .warning-msg {
     color: var(--primary-color);
     font-weight: 600;
     margin-bottom: 5px;
 }
 
-/* Botão específico para criar pasta (Escuro) */
 .btn-create-folder {
-    background-color: var(--text-color); /* Fundo escuro (#202024) */
+    background-color: var(--text-color); 
     color: white;
     border: none;
     padding: 15px;
@@ -712,44 +677,26 @@ separator-line {
 }
 
 .btn-create-folder:hover {
-    background-color: #000000; /* Fica preto total no hover */
+    background-color: #000000; 
     transform: translateY(-2px);
     box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
 }
 
-/* Área onde a mensagem de sucesso/erro aparece */
 .creation-result {
     width: 100%;
     margin-top: 10px;
 }
 
-/* Adicionando animação nas classes de status que você já tinha */
-.status-success, .status-error {
-    animation: fadeIn 0.5s ease;
-}
-
-/* --- ESTILOS DE ERRO E AVISO --- */
-
-/* Linha separadora suave */
-.separator-line {
-    background-color: var(--border-color);
-    height: 1px;
-    width: 100%;
-    opacity: 0.5;
-}
-
-/* Mensagem de Erro Vermelha (Para Arquivo não encontrado) */
 .error-msg {
-    color: #dc2626; /* Vermelho */
+    color: #dc2626; 
     font-weight: 600;
     font-size: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px; /* Espaço entre ícone e texto */
+    gap: 8px; 
 }
 
-/* Texto auxiliar cinza abaixo do erro */
 .error-subtext {
     color: var(--text-muted);
     font-size: 0.85rem;
@@ -757,20 +704,10 @@ separator-line {
     font-weight: 500;
 }
 
-/* --- BOTÃO TENTAR NOVAMENTE E LINKS --- */
-
-/* Garante que o link ocupe a largura total do container */
-.download-link {
-    text-decoration: none;
-    width: 100%;
-    display: block; /* Essencial para o width: 100% funcionar corretamente */
-}
-
-/* Classe específica para o botão de tentar novamente */
 .btn-retry {
     width: 100%;
     margin: 15px auto 0 auto; 
-    display: flex;       
+    display: flex;      
     align-items: center; 
     justify-content: center; 
     gap: 10px; 
