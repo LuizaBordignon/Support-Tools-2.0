@@ -1,11 +1,11 @@
 📦 FTP Database Manager
 
-"Python" (https://img.shields.io/badge/Python-3.x-blue?logo=python)
-"Flask" (https://img.shields.io/badge/Flask-Web_Framework-black?logo=flask)
-"Gunicorn" (https://img.shields.io/badge/Gunicorn-WSGI_Server-green)
-"Status" (https://img.shields.io/badge/status-active-success)
-
----
+<p align="left">
+  <img src="https://img.shields.io/badge/Python-3.x-blue?logo=python">
+  <img src="https://img.shields.io/badge/Flask-Web_Framework-black?logo=flask">
+  <img src="https://img.shields.io/badge/Gunicorn-WSGI_Server-green">
+  <img src="https://img.shields.io/badge/status-active-success">
+</p>---
 
 📖 Sobre o Projeto
 
@@ -17,17 +17,16 @@ A aplicação consiste em uma interface web que realiza conexão com um servidor
 
 ⚙️ Tecnologias Utilizadas
 
-- Python
-- Flask
-- Gunicorn
-- FTP
-- HTML,CSS e JavaScript
+🐍 Python
+🌐 Flask
+🚀 Gunicorn
+📡 FTP
 
 ---
 
 📦 Instalação
 
-Antes de executar o projeto, instale as dependências necessárias:
+Instale as dependências:
 
 pip install flask
 pip install gunicorn
@@ -36,29 +35,19 @@ pip install gunicorn
 
 ▶️ Executando o Projeto
 
-1. Acesse a pasta onde está localizado o arquivo "app.py"
-
-2. Abra o terminal nessa pasta
-
-3. Execute o comando:
+1. Abra o terminal na pasta do projeto
+2. Execute:
 
 python app.py
 
-Após executar o comando, o servidor será iniciado e um endereço LocalHost será exibido no terminal.
-
-Abra o navegador e acesse o link informado para utilizar a aplicação.
+3. O terminal exibirá um endereço LocalHost.
+4. Abra esse link no navegador para utilizar a aplicação.
 
 ---
 
 🚀 Funcionalidades
 
-- 🔗 Conexão com servidor FTP
-- ⬆️ Upload de bancos de dados
-- ⬇️ Download de backups
-- 🖥️ Interface web para facilitar operações do time de suporte
-
----
-
-🧠 Objetivo
-
-O objetivo da aplicação é automatizar e simplificar o processo de envio e download de backups de banco de dados, reduzindo erros manuais e tornando o processo mais rápido para o time de suporte.
+⬆️ Upload de banco de dados
+⬇️ Download de backups
+🔗 Conexão com servidor FTP
+🖥 Interface web para facilitar operações do suporte
