@@ -15,7 +15,7 @@
 
 ---
 
-⚙️ Tecnologias Utilizadas
+<h2>⚙️ Tecnologias Utilizadas</h2>
 
 <p>🐍 Python</p>
 <p>🌐 Flask</p>
