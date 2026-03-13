@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/status-active-success">
 </p>---
 
-<h5>📖 Sobre o Projeto</h5>
+📖 Sobre o Projeto
 
 <p>Este projeto foi desenvolvido para atender uma necessidade do time de Suporte da Thomson Reuters.</p>
 
@@ -17,8 +17,8 @@
 
 ⚙️ Tecnologias Utilizadas
 
-🐍 Python
-🌐 Flask
+<p>🐍 Python</p>
+<p>🌐 Flask</p>
 🚀 Gunicorn
 📡 FTP
 
