@@ -1,8 +1,8 @@
 📦 FTP Database Manager
 
 "Python" (https://img.shields.io/badge/Python-3.x-blue?logo=python)
-"Flask" (https://img.shields.io/badge/Flask-Web%20Framework-black?logo=flask)
-"Gunicorn" (https://img.shields.io/badge/Gunicorn-WSGI%20Server-green)
+"Flask" (https://img.shields.io/badge/Flask-Web_Framework-black?logo=flask)
+"Gunicorn" (https://img.shields.io/badge/Gunicorn-WSGI_Server-green)
 "Status" (https://img.shields.io/badge/status-active-success)
 
 ---
