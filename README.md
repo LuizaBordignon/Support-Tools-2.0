@@ -1,4 +1,4 @@
-📦 FTP Database Manager
+<h3>📦 FTP Database Manager</h3>
 
 <p align="left">
   <img src="https://img.shields.io/badge/Python-3.x-blue?logo=python">
@@ -7,11 +7,11 @@
   <img src="https://img.shields.io/badge/status-active-success">
 </p>---
 
-📖 Sobre o Projeto
+<h5>📖 Sobre o Projeto</h5>
 
-Este projeto foi desenvolvido para atender uma necessidade do time de Suporte da Thomson Reuters.
+<p>Este projeto foi desenvolvido para atender uma necessidade do time de Suporte da Thomson Reuters.</p>
 
-A aplicação consiste em uma interface web que realiza conexão com um servidor FTP utilizando Python, permitindo realizar upload e download de bancos de dados de forma centralizada e simplificada.
+<p>A aplicação consiste em uma interface web que realiza conexão com um servidor FTP utilizando Python, permitindo realizar upload e download de bancos de dados de forma centralizada e simplificada.</p>
 
 ---
 
