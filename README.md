@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/status-active-success">
 </p>---
 
-📖 Sobre o Projeto
+<h2>📖 Sobre o Projeto</h2>
 
 <p>Este projeto foi desenvolvido para atender uma necessidade do time de Suporte da Thomson Reuters.</p>
 
@@ -19,35 +19,35 @@
 
 <p>🐍 Python</p>
 <p>🌐 Flask</p>
-🚀 Gunicorn
-📡 FTP
+<p>🚀 Gunicorn</p>
+<p>📡 FTP</p>
 
 ---
 
-📦 Instalação
+<h2>📦 Instalação</h2>
 
 Instale as dependências:
 
-pip install flask
+<p>pip install flask</p>
 pip install gunicorn
 
 ---
 
-▶️ Executando o Projeto
+<h2>▶️ Executando o Projeto</h2>
 
-1. Abra o terminal na pasta do projeto
-2. Execute:
+<p>1. Abra o terminal na pasta do projeto</p>
+<p>2. Execute:</p
 
-python app.py
+<p>python app.py</p>
 
-3. O terminal exibirá um endereço LocalHost.
-4. Abra esse link no navegador para utilizar a aplicação.
+<p>3. O terminal exibirá um endereço LocalHost.</p>
+<p>4. Abra esse link no navegador para utilizar a aplicação.</p>
 
 ---
 
-🚀 Funcionalidades
+<h2>🚀 Funcionalidades</h2>
 
-⬆️ Upload de banco de dados
-⬇️ Download de backups
-🔗 Conexão com servidor FTP
-🖥 Interface web para facilitar operações do suporte
+<p>⬆️ Upload de banco de dados</p>
+<p>⬇️ Download de backups</p>
+<p>🔗 Conexão com servidor FTP</p>
+<p>🖥 Interface web para facilitar operações do suporte</p>
