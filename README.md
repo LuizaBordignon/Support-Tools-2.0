@@ -1,4 +1,4 @@
-<h3>📦 FTP Database Manager</h3>
+<h1>📦 FTP Database Manager</h1>
 
 <p align="left">
   <img src="https://img.shields.io/badge/Python-3.x-blue?logo=python">
