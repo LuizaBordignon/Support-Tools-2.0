@@ -62,7 +62,7 @@ init_db()
 
 def listar_cliente():
     ftp = FTP('ftp.dominiosistemas.com.br')
-    ftp.login(user='suportesc', passwd='pmn7755')
+    ftp.login(user='teste', passwd='teste2')
 
     ftp.cwd('/') #raiz
     itens = []
@@ -81,7 +81,7 @@ def listar_diretorios_ftp(tipo):
     if not tipo: return []
     try:
         ftp = FTP('ftp.dominiosistemas.com.br')
-        ftp.login(user='suportesc', passwd='pmn7755')
+        ftp.login(user='teste', passwd='teste2')
 
         ftp.cwd(f'/{tipo}')
         itens = []
@@ -105,7 +105,7 @@ def listar_diretorios_ftp(tipo):
 def caminho_existe_ftp(caminho):
     ftp = FTP('ftp.dominiosistemas.com.br')
     try:
-        ftp.login(user='suportesc', passwd='pmn7755')
+        ftp.login(user='teste', passwd='teste2')
         ftp.cwd(caminho)
         return True
     except error_perm:
@@ -118,7 +118,7 @@ def caminho_existe_ftp(caminho):
 def arquivo_existe_ftp(caminho, nome_arquivo):
     ftp = FTP('ftp.dominiosistemas.com.br')
     try:
-        ftp.login(user='suportesc', passwd='pmn7755')
+        ftp.login(user='teste', passwd='teste2')
         ftp.set_pasv(True)
         ftp.voidcmd('TYPE I')
         ftp.cwd(caminho)
@@ -167,7 +167,7 @@ def criar_pasta():
 
     ftp = FTP('ftp.dominiosistemas.com.br')
     try:
-        ftp.login(user='suportesc', passwd='pmn7755')
+        ftp.login(user='teste', passwd='teste2')
         ftp.cwd('/') 
         partes = caminho.strip('/').split('/')
 
@@ -355,7 +355,7 @@ def upload_cliente(token):
     ftp = FTP('ftp.dominiosistemas.com.br')
 
     try:
-        ftp.login(user='suportesc', passwd='pmn7755')
+        ftp.login(user='teste', passwd='teste2')
         
         # MODO BINÁRIO E PASSIVO OBRIGATÓRIO
         ftp.set_pasv(True)
@@ -415,7 +415,7 @@ def download_cliente(token):
     ftp = FTP('ftp.dominiosistemas.com.br')
 
     try:
-        ftp.login(user='suportesc', passwd='pmn7755')
+        ftp.login(user='teste', passwd='teste2')
         ftp.set_pasv(True) 
         ftp.voidcmd('TYPE I') 
 
@@ -459,7 +459,7 @@ def pagina_download_cliente(token):
     tamanho = None
 
     try:
-        ftp.login(user='suportesc', passwd='pmn7755')
+        ftp.login(user='teste', passwd='teste2')
         ftp.set_pasv(True)
         ftp.voidcmd('TYPE I')
         try:
